@@ -32,7 +32,6 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.mail import BadHeaderError, send_mail
-from .tasks import send_mail_register, send_poll_notification, send_email_organizer
 from django.template import loader
 from collections import Counter
 from Crypto.Cipher import DES
