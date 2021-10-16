@@ -115,7 +115,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'eporqep6b4b8ql12.chr7pe7iynqr.eu-west-1.rds.amazonaws.com	',
+            'HOST': 'eporqep6b4b8ql12.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
             'PORT': '3306',
             'NAME': 'd3vann1pn1selinh',
             'USER': 'xb8yrts7avji0vpv',
