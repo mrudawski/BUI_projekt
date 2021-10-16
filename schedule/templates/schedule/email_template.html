@@ -1,0 +1,21 @@
+{% load static %}
+{% if user %}
+Cześć! {{ user.first_name }}
+W najbliższym czasie masz szkolenia do zorganizowania, oto ich lista:
+{% for event in events %}
+{{event.title}}
+{{event.planning_date}}
+{{event.description}}
+{% endfor %}
+{% else %}
+Hej! Może zainteresuą Cie nasze nadchodzące szkolenia:
+{% for event in events %}
+{{event.title}}
+{{event.planning_date}}
+{{event.description}}
+{% endfor %}
+{% endif %}
+
+Twój Zespół FFT.
+
+        
