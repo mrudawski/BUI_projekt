@@ -115,10 +115,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'localhost',
+            'HOST': 'eporqep6b4b8ql12.chr7pe7iynqr.eu-west-1.rds.amazonaws.com	',
             'PORT': '3306',
-            'NAME': 'scheduler_database',
-            'USER': 'root',
+            'NAME': 'd3vann1pn1selinh',
+            'USER': 'xb8yrts7avji0vpv',
+            'PASSWORD': 'w6nczr3hpj5zqg9j',
             'OPTIONS': {
                 'autocommit': False,
             },
