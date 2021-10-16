@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'schedule.apps.ScheduleConfig',
+    'schedule',
     'django_celery_beat',
     'crispy_forms',
     'mathfilters'
