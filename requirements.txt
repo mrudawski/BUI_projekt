@@ -39,3 +39,4 @@ vine
 wcwidth==0.2.5
 zope.interface==5.3.0
 pytest
+whitenoise
