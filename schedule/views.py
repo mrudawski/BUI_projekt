@@ -441,7 +441,6 @@ def draft_edit(request, index):
                         selected_event.attachment = new_attachment
                         selected_event.save(update_fields=["attachment"])
 
-                    send_email_organizer.delay(organizer, index)
                     request.session['ref_times'] = 0
                     request.session['event_success'] = True
         return redirect('events_list')
@@ -626,7 +625,6 @@ def draft_edit(request, index):
 
                         update_poll = Polls.objects.filter(event=index).update(if_active=False)
 
-                        send_email_organizer.delay(organizer, index)
                         request.session['ref_times'] = 0
                         request.session['event_success'] = True
 
@@ -649,7 +647,6 @@ def create_event(request):
                 event_form = form.save()
                 event_pk = event_form.pk
                 organizer_pk = get_object_or_404(User, username=organizer).pk
-                send_email_organizer.delay(organizer_pk, event_pk)
                 request.session['ref_times'] = 0
                 request.session['event_success'] = True
                 return redirect('events_list')
