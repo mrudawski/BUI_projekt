@@ -80,30 +80,6 @@ class Subject(models.Model):
     class Meta:
         ordering = ('-created',)
 
-
-class EmailSet(models.Model):
-    delay_leader = models.IntegerField(default=3)
-    delay_all = models.IntegerField(default=2)
-    # USTAWIENIA SERWERA POCZTY
-    EMAIL_BACKEND = models.CharField(max_length=50, default="django.core.mail.backends.smtp.EmailBackend")
-    EMAIL_HOST = models.CharField(max_length=30)
-    EMAIL_PORT = models.IntegerField(default=587)
-    EMAIL_HOST_USER = models.CharField(max_length=50)
-    EMAIL_HOST_PASSWORD = models.BinaryField(max_length=100)
-    EMAIL_USE_TLS = models.BooleanField(default=True)
-    DEFAULT_FROM_EMAIL = models.CharField(max_length=50)
-    EMAIL_HEADER = models.CharField(max_length=50)
-    NONCE = models.BinaryField(max_length=100, blank=True)
-
-
-class EventNotification(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    leader = models.ForeignKey(User, on_delete=models.CASCADE)
-    if_sent_leader = models.BooleanField(default=False)
-    if_sent_all = models.BooleanField(default=False)
-    settings = models.ForeignKey(EmailSet, on_delete=models.CASCADE, default=1)
-
-
 class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)

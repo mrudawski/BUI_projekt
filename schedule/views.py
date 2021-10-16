@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from .models import Event, Subject, User, EmailSet, Comment, Polls, Dates
+from .models import Event, Subject, User, Comment, Polls, Dates
 from django.core.mail import send_mail, get_connection, send_mass_mail
 from django.core.mail import EmailMessage
 from django.utils import timezone
@@ -1016,98 +1016,6 @@ def delete_subject(request, index):
 
     return render(request, 'schedule/subjects_list.html')
 
-
-@allowed_users(allowed_roles=['admin'])
-def email_client(request):
-
-    if request.method == 'GET':
-        settings_db = EmailSet.objects.filter(id=1)[0]
-        password = email_pass_dec()
-        context = {'settings': settings_db, 'password': password}
-
-        return render(request, 'schedule/email_client.html', context=context)
-
-    if request.method == 'POST':
-
-        email_host = request.POST.get('email_host')
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        port = request.POST.get('port')
-        if_tls = request.POST.get('if_tls')
-        delay_leader = request.POST.get('delay_leader')
-        delay_all = request.POST.get('delay_all')
-        from_email = request.POST.get('from_email')
-
-        email_body = render_to_string('schedule/email_test_template.html')
-
-        try:
-
-            with get_connection(host=email_host, port=port, username=username, password=password, use_tls=if_tls) as conn:
-                msg = EmailMessage(subject='FFT - Wiadomość testowa', from_email=from_email, body=email_body,
-                                   to=[request.user.email], connection=conn)
-
-                msg.send(fail_silently=True)
-
-        except Exception as e:
-
-            e = str(e)
-
-            if "535" in e:
-                error = 'Login i/lub hasło są nieprawidłowe'
-
-            elif "10060" in e:
-                error = 'Port jest nieprawidłowy'
-
-            elif "11001" in e:
-                error = 'Nazwa serwera jest nieprawidłowa'
-
-            elif "Invalid address; only" in e:
-                error = 'Błędna nazwa nadawcy. Powinna być w formie: nazwa <mail@serwer.domena> lub sama nazwa'
-
-            else:
-                error = e
-
-            settings_db = EmailSet.objects.filter(id=1)[0]
-            context = {'settings': settings_db, 'error': error}
-
-            return render(request, 'schedule/email_client.html', context)
-
-        cipher = DES.new(settings.KEY, DES.MODE_EAX)
-        nonce = cipher.nonce
-        password_encrypted = cipher.encrypt(password.encode('ascii'))
-
-        EmailSet.objects.filter(id=1).update(delay_leader=delay_leader, delay_all=delay_all, EMAIL_HOST=email_host,
-                                             EMAIL_PORT=port, EMAIL_HOST_USER=username,
-                                             EMAIL_HOST_PASSWORD=password_encrypted, EMAIL_USE_TLS=if_tls,
-                                             EMAIL_HEADER=from_email, NONCE=nonce)
-
-        return redirect('email_client')
-
-
-@allowed_users(allowed_roles=['admin'])
-def email_notification(request):
-
-    if request.method == 'GET':
-        module_dir = os.path.dirname(__file__)
-        file_path = os.path.join(module_dir, 'templates/schedule/email_template.html')
-        data_file = open(file_path, 'r', encoding='utf-8')
-        data = data_file.read()
-
-        return render(request, 'schedule/email_notification.html', context={'notification': data})
-
-    if request.method == 'POST':
-
-        notification = request.POST.get('notification')
-        module_dir = os.path.dirname(__file__)
-        file_path = os.path.join(module_dir, 'templates/schedule/email_template.html')
-        with open(file_path, 'w', encoding='utf-8') as output:
-            for line in notification.splitlines():
-                output.write(line)
-                output.write('\n')
-
-        return redirect('email_notification')
-
-
 @allowed_users(allowed_roles=['admin', 'employee'])
 def event_edit(request, index):
     poll_status = 0
@@ -1478,13 +1386,12 @@ def password_reset_request(request):
                         }
                         email = render_to_string(email_template_name, c)
 
-                        mail_settings = EmailSet.objects.filter(pk=1)[0]
-                        host = mail_settings.EMAIL_HOST
-                        port = mail_settings.EMAIL_PORT
-                        username = mail_settings.EMAIL_HOST_USER
-                        password = email_pass_dec()
-                        use_tls = bool(mail_settings.EMAIL_USE_TLS)
-                        from_email = mail_settings.EMAIL_HEADER
+                        host = 'lalala'
+                        port = 123
+                        username = 'lalala'
+                        password = 'lalala'
+                        use_tls = bool(1)
+                        from_email = 'lalala'
                         with get_connection(host=host, port=port, username=username, password=password,
                                                 use_tls=use_tls) as conn:
                             msg = EmailMessage(subject=subject, body=email,
@@ -1520,15 +1427,3 @@ def handler_400(request, exception):
 def handler_500(request):
     return render(request, 'schedule/500.html')
 
-
-def email_pass_dec():
-
-    try:
-        settings_db = EmailSet.objects.filter(id=1)[0]
-        nonce = settings_db.NONCE
-        cipher = DES.new(settings.KEY, DES.MODE_EAX, nonce=nonce)
-        enc_password = settings_db.EMAIL_HOST_PASSWORD
-        plaintext = cipher.decrypt(enc_password)
-        return plaintext.decode(encoding='ascii')
-    except:
-        pass

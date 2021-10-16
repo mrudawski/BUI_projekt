@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Event, Subject, Polls, Dates, EmailSet, EventNotification, Comment
+from .models import Event, Subject, Polls, Dates, Comment
 
 
 @admin.register(Event)
@@ -34,12 +34,3 @@ class CommentAdmin(admin.ModelAdmin):
 class DatesAdmin(admin.ModelAdmin):
     pass
 
-
-@admin.register(EmailSet)
-class EmailSetAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(EventNotification)
-class EventNotificationAdmin(admin.ModelAdmin):
-    pass
