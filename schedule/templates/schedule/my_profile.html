@@ -101,11 +101,8 @@
 						<div class="form-group">
 							<label for="email">E-mail:</label>
 							<input class="form-control" type="email" name="email" id="email_" value="{{request.user.email}}" required>
-						  </div>
 						</div>
 
-					  </div>
-						</div>
 
 
 
@@ -193,10 +190,12 @@
 				{{i.planning_date}}
 			</div>
 		</div>
-	</div>
+	<br>
+	{% endfor %}
+		</div>
 </div>
 		<br><br>
-	{% endfor %}
+
 
 		<br><br>
 
