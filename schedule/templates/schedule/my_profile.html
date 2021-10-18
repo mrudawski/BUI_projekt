@@ -38,7 +38,7 @@
 					{% if request.user.groups.all.0.name == "admin" %}
                     <h4 id="group">Administrator</h4>
 					{% elif request.user.groups.all.0.name == "employee"  %}
-					<h4 id="group">Pracownik</h4>
+					<h4 id="group">Użytkownik</h4>
 					{% else %}
 					<h4 id="group">{{request.user.groups.all.0.name}}</h4>
 					{% endif %}
