@@ -37,9 +37,7 @@
 					<li class="nav-item">
 						<a class="nav-link" href="{% url 'events_list' %}">Szkolenia</a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{% url 'subjects_list' %}">Tematy</a>
-					</li>
+
 					{% if request.user.is_authenticated %}
 					{% if request.user|have_polls %}
 					<li class="nav-item">
@@ -59,10 +57,6 @@
 
                 {% if request.user|has_group:"admin" %}
 				<button class="btn navbar-btn"><a href="{% url 'create_event' %}"><span>Utwórz szkolenie</span></a></button>
-                {% endif %}
-
-				{% if request.user|has_group:"employee" or request.user|has_group:"admin" %}
-				<button class="btn navbar-btn"><a href="{% url 'suggest_event' %}"><span>Zgłoś temat</span></a></button>
                 {% endif %}
 
                 {% if not user.is_authenticated %}

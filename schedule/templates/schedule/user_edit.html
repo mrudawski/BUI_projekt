@@ -40,10 +40,7 @@
 			<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 				<div class="form-group">
 					<label for="email">E-mail:</label>
-                    <input class="form-control" id="email_" name="email" placeholder="E-mail" required type="email" value="{{i.email}}" onfocusout="validateEmail()">
-					<div id="validationServer03Feedback" class="invalid-feedback">
-						  Wprowadź poprawny adres e-mail, zawierający suffix comarch.pl lub comarch.com
-					</div>
+                    <input class="form-control" id="email_" name="email" placeholder="E-mail" required type="email" value="{{i.email}}">
 				</div>
 			</div>
 			<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
@@ -70,24 +67,6 @@
 		{% endfor %}
 </form>
 </div>
-
-<script>
-
-	function validateEmail() {
-			var email = document.getElementById('email_').value;
-
-			email = email.toString();
-
-			if ( /^([A-Za-z0-9_\-\.])+\@(comarch)+\.(com|pl)$/.test(email) || /^([A-Za-z0-9_\-\.])+\@(gmail)+\.(com)$/.test(email)) {
-				document.getElementById('submitButton').disabled = false;
-				document.getElementById('email_').classList.remove("is-invalid");
-			} else {
-				document.getElementById('submitButton').disabled = true;
-				document.getElementById('email_').classList.add("is-invalid");
-			}
-		}
-
-</script>
 
 </body>
 </html>

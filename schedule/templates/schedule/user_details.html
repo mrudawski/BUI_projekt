@@ -106,26 +106,7 @@
 		<br><br>
 	{% endfor %}
 
-	    <h2 style="text-align:center;">ZGŁOSZONE TEMATY ({{subjects_cnt}})</h2>
-    <br>
-    {% for i in subjects %}
-<div class="row gutters" >
-	<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-		<div class="card">
-			<h4 class="card-header">{{i.title}}
-			&nbsp;
-    <a href="{% url 'subject_edit' i.id %}"><img src="{% static 'images/icons/edit.png' %}" style="text-align:right; width:25px; height:25px;"></a>
-    &nbsp;
-    <a href="{% url 'delete_subject' i.id %}" onclick="return confirm('Czy na pewno chcesz usunąć temat {{i.title}}? Operacji nie będzie można cofnąć!');"><img src="{% static 'images/icons/delete.png' %}" style="text-align:right; width:25px; height:25px;"></a>
-    		</h4><br>
-       		 <h5 class="card-text" id="like_count">Opis: {{ i.description }}</h5><br>
-		</div>
-	</div>
-</div>
 		<br>
-	{% endfor %}
-
-		<br><br>
 
 
 

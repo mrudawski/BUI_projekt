@@ -33,8 +33,6 @@
             </th>
             <th class="th-sm">Szkolenia
             </th>
-            <th class="th-sm">Tematy
-            </th>
             <th class="th-sm">Zarządzanie
             </th>
 
@@ -61,11 +59,7 @@
             {% endif %}
             {% endfor %}
 
-            {% for subjects in subjects_cnt %}
-            {% if forloop.counter == forloop.parentloop.counter %}
-            <td>{{subjects}}</td>
-            {% endif %}
-            {% endfor %}
+
 
             <td><center>
                 <a href="{% url 'user_details' i.id %}"><img src="{% static 'images/icons/details.png' %}" style="width:30px; height:30px;"></a>
