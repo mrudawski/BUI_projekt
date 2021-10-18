@@ -85,38 +85,15 @@ def register_page(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
 
-            # sprawdzanie prefixu i suffixu maila
-            email = form.cleaned_data.get('email')
-            suffix = (email.rsplit('@'))[1]
-            prefix = (email.split('@'))[0]
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            group = Group.objects.get(name='employee')
+            user.groups.add(group)
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
 
-            User = get_user_model()
-            emails = User.objects.all().values_list('email')
-            prefixes = []
-            for i in emails:
-                prefixes.append((str(i).rsplit('\'')[1].split('@')[0]))
-
-            is_unique = True
-
-            for i in prefixes:
-                if i == prefix:
-                    is_unique = False
-
-            if suffix == 'gmail.com' or suffix == 'comarch.pl' or suffix == 'comarch.com':
-                if is_unique:
-                    user = form.save()
-                    username = form.cleaned_data.get('username')
-                    raw_password = form.cleaned_data.get('password1')
-                    group = Group.objects.get(name='employee')
-                    user.groups.add(group)
-                    user = authenticate(username=username, password=raw_password)
-                    login(request, user)
-                    send_mail_register.delay(email)
-                    return redirect('home')
-                else:
-                    messages.error(request, "Błąd: adres e-mail znajduje się już w bazie")
-            else:
-                messages.error(request, "Błąd: adres e-mail powinien posiadać suffix comarch.pl lub comarch.com")
     else:
         form = CreateUserForm()
 
