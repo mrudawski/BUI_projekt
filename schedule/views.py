@@ -38,6 +38,7 @@ from Crypto.Cipher import DES
 from django.contrib.messages import get_messages
 
 
+
 def home_page(request):
     now = timezone.now()
     upcoming_events_list = Event.objects.filter(planning_date__gte=now)
