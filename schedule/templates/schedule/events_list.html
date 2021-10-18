@@ -195,33 +195,6 @@
 
         <div class="hidden-md-down" style="border-left:1px solid lightgray;height:70px;"></div>
 
-
-    <div class="col-lg-2 col-md-12 col-sm-12" >
-        <div class="hidden-lg-up"><hr></div>
-        <form method="GET" action="">
-            <div class="form-check">
-                <label><input type="radio" name="show" id="show_historical" value="historical"> Historyczne</label>
-            </div>
-            <div class="form-check">
-                <label><input type="radio" name="show" id="show_upcoming" value="upcoming"> Nadchodzące</label>
-            </div>
-        </div>
-        <div style="border-left:1px solid lightgray;height:70px;" class="hidden-md-down"></div>
-        {% if request.user.is_authenticated %}
-
-    <div class="col-lg-2 col-md-12 col-sm-12">
-        <div class="hidden-lg-up"><hr></div>
-        <div class="form-check">
-            <label><input type="checkbox" name="only_mine" id="only_mine" value="1" onclick="setflag()"> Moje szkolenia</label>
-        </div>
-
-        <div class="form-check">
-            <label><input type="checkbox" name="drafts" id="drafts" value="1" onclick="setflag2()"> Szkice szkoleń</label>
-        </div>
-    </div>
-        <div class="hidden-md-down" style="border-left:1px solid lightgray;height:70px;"></div>
-        {% endif %}
-
     <div class="col-lg-2 col-md-12 col-sm-12" style="padding-top: 15px;">
         <div class="hidden-lg-up"><hr></div>
             <input type="text" class="form-control" name="title" id="title" placeholder="Wpisz tytuł">
