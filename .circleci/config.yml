@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   python: circleci/python@1.2
+  heroku: circleci/heroku@0.0.10
 jobs:
   build-and-test:
     docker:
@@ -12,12 +13,10 @@ jobs:
       - run:
           name: Run tests
           command: pytest
-      - run:
-          name: Build docker image
-          command: |
-            docker build -t heroku-dockerize:circleci .
-            docker images
 workflows:
   sample:
     jobs:
       - build-and-test
+  heroku_deploy:
+    jobs:
+      - heroku/deploy-via-git
