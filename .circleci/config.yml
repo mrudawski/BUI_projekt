@@ -14,7 +14,7 @@ jobs:
           name: Run tests
           command: pytest
 workflows:
-  tests:
+  test-and-deploy:
     jobs:
       - build-and-test
       - heroku/deploy-via-git:
