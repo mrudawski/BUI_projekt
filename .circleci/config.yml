@@ -17,4 +17,7 @@ workflows:
   tests:
     jobs:
       - build-and-test
+  heroku_deploy:
+    when: on_success
+    jobs:
       - heroku/deploy-via-git
