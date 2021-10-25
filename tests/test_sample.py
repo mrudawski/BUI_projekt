@@ -1,3 +1,5 @@
+import time
 
-print("Test passed")
-pass
+
+def test_funcfast():
+    time.sleep(0.1)
