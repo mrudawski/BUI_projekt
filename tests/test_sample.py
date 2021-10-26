@@ -2,4 +2,5 @@ import time
 
 
 def test_funcfast():
-    time.sleep(0.1)
+    test = 10/0
+    print(test)
