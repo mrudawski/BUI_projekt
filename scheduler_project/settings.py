@@ -32,7 +32,7 @@ KEY = b'\xb5\xabSG\xf2~]\x99'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['54.152.31.67', 'ec2-54-152-31-67.compute-1.amazonaws.com']
+ALLOWED_HOSTS = ['*']
 
 DISABLE_COLLECTSTATIC=1
 
