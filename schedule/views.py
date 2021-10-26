@@ -1,42 +1,27 @@
 import scheduler_project.settings
-from .forms import CreateUserForm, UserFullnameChoiceField
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from .forms import CreateUserForm
 from .forms import CreateEvent
-from .forms import SubjectForm, AddComment
+from .forms import AddComment
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from datetime import datetime, date
 from django.contrib.auth.models import Group
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
-from .models import Event, Subject, User, Comment, Polls, Dates
+from .models import Event, User, Comment
 from django.core.mail import send_mail, get_connection, send_mass_mail
 from django.core.mail import EmailMessage
 from django.utils import timezone
-import pytz
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator, EmptyPage
 from django.template.loader import get_template, render_to_string
-import os
 from .forms import ChangePassword
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
-from django.conf import settings
-from django.http import HttpResponse
 from django.db.models import Q
-from django.core.mail import BadHeaderError, send_mail
-from django.template import loader
-from collections import Counter
-from Crypto.Cipher import DES
-from django.contrib.messages import get_messages
-
 
 
 def home_page(request):

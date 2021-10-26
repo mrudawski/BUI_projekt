@@ -40,45 +40,9 @@ class Event(models.Model):
     class Meta:
         ordering = ('planning_date',)
 
-    def __str__ (self):
+    def __str__(self):
         return self.title
 
-
-class Polls(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, default=None, blank=True)
-    if_active = models.BooleanField(default=False, blank=True)
-    since_active = models.DateField(blank=True, null=True, default=None)
-    till_active = models.DateField(blank=True, null=True, default=None)
-    if_sent_notification = models.BooleanField(blank=True, null=True, default=False)
-
-
-class Dates(models.Model):
-    poll = models.ForeignKey(Polls, on_delete=models.CASCADE)
-    date = models.DateTimeField(blank=True, null=True)
-    count = models.IntegerField(null=True, blank=True, default=0)
-    users = models.ManyToManyField(User, related_name='users', default=None, blank=True)
-
-
-class Subject(models.Model):
-    proposer = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique_for_date='created', default=None)
-    description = models.TextField(verbose_name='opis tematu', max_length=400)
-    created = models.DateTimeField(auto_now_add=True)
-    likes = models.ManyToManyField(User, related_name='like', default=None, blank=True)
-    like_count = models.IntegerField(default='0')
-    want_to_lead = models.ManyToManyField(User, related_name='want_to_lead', default=None, blank=True)
-    lead_count = models.IntegerField(default='0')
-
-    def save (self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        super(Subject, self).save(*args, **kwargs)
-
-    def __str__ (self):
-        return self.title
-
-    class Meta:
-        ordering = ('-created',)
 
 class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
