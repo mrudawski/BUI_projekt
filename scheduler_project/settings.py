@@ -115,11 +115,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'eporqep6b4b8ql12.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
+            'HOST': '34.116.229.207',
             'PORT': '3306',
-            'NAME': 'd3vann1pn1selinh',
-            'USER': 'xb8yrts7avji0vpv',
-            'PASSWORD': 'w6nczr3hpj5zqg9j',
+            'NAME': 'buibui-db',
+            'USER': 'buibui',
+            'PASSWORD': '5dYD9FgPraqB2Nnk',
             'OPTIONS': {
                 'autocommit': False,
             },
