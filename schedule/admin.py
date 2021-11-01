@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Event, Subject, Polls, Dates, Comment
+from .models import Event, Comment
 
 
 @admin.register(Event)
@@ -13,24 +13,6 @@ class EventAdmin(admin.ModelAdmin):
     ordering = ('status', 'publish')
 
 
-@admin.register(Subject)
-class SubjectAdmin(admin.ModelAdmin):
-    list_display = ('title', 'proposer', 'created', 'like_count', 'lead_count')
-    prepopulated_fields = {'slug': ('title',)}
-    raw_id_fields = ('proposer',)
-
-
-@admin.register(Polls)
-class PolesAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     pass
-
-
-@admin.register(Dates)
-class DatesAdmin(admin.ModelAdmin):
-    pass
-

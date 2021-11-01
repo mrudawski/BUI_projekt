@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.db import models
-from .models import Event, Subject, Comment
+from .models import Event, Comment
 import datetime
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from .decorators import unauthenticated_user, allowed_users
@@ -31,12 +31,6 @@ class CreateEvent(ModelForm):
     class Meta:
         model = Event
         fields = ('title', 'description', 'organizer', 'planning_date', 'duration', 'icon', 'attachment', 'link')
-
-
-class SubjectForm(ModelForm):
-    class Meta:
-        model = Subject
-        fields = ('title', 'description')
 
 
 class ChangePassword(PasswordChangeForm):

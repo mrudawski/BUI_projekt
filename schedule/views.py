@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from .forms import CreateUserForm
 from .forms import CreateEvent
-from .forms import SubjectForm, AddComment
+from .forms import AddComment
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from datetime import datetime, date
@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from .models import Event, Subject, User, Comment, Polls, Dates
+from .models import Event, User, Comment
 from django.core.mail import send_mail, get_connection, send_mass_mail
 from django.core.mail import EmailMessage
 from django.utils import timezone
@@ -36,7 +36,6 @@ from django.template import loader
 from collections import Counter
 from Crypto.Cipher import DES
 from django.contrib.messages import get_messages
-
 
 
 def home_page(request):
