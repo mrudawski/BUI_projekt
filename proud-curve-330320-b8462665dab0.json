@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "proud-curve-330320",
+  "private_key_id": "b8462665dab04959c1dd574d425d856bf07f6372",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDVHunoI3yCE/om\nswCDRt0mFQ13VxLSsEK3PWnsd+4g/eXOKK97b75qv1x3iF24TTiXerSjgR8iCfEN\nPakWa3mO9BNFI6cZp9GooeHvKZeVZZM5vZodKp2VLiel2FEQDdsnhN/uyf9i8UaF\nVSao+6ICwt+ES5t2ZFtcMfcUmHG/njdfZXDqCruTdmiBe6fMFzTJDrhtpwnnJmGL\n8h+gRJKIfJIf3e2WXJxGgKbYvUTBE/Y34ccgG+D8qk1NLtgdzQ5F78f7JIOT5xh4\nC5HsBEtAHcWRf0o3TXeDi9cVKKJbPS0kjNmOfQvWAAuw9J7YC8ZrZMTWw6U8LrT0\nw9AnbjuVAgMBAAECggEABbUFOIUywVz9lum2Os28AFgR+z8mruOvda68VmvDwbhq\n3gFy6ZBNfhhPxpetQtE2kb/kdHhxt/yiKuOa0pHgOHbKyVAyGlrHH4fuP/RSLdsB\nfUtZhCxu+d65ixRm31IvqzhAsulP4Htrkwh7t4y9gutrBuTrbdk0JRzla/TFHwd2\nFKBiJ8f1mKVm3R+r4h5wTaJTF3tNn1o8hI4DS1uvSY7s2YuOJJ5HlTqiQLF90bdI\nVmWEDaNnxCUeMD33ZsCAcekU41eWf9KxE7yO3fmFQRbRsddufvCHW63T11sIgWVV\n9A6I2SzGV2NJraIezNu1iMBTihS0qQfL9mOMGzU6oQKBgQD5d53auZrtqibQwWP7\n436KdFbLAQwxz9ELgLDdQCRzUARoQOfFvXqbn9ZQajM5FUe+L8mojk3X23ZBSbzz\nJhvXuUfbLQqSwy78+UJYMe+sk1T5ytHxgDc63p8jjwX5RAC/UueZEzdAF2GYRqa7\nLc/P7k3xKqQCDSk+QJ8LNeDxKQKBgQDas6MBYP6OFA0AjbCKiQFWcheoT4Ty1dvY\noIwcr+s5JlnDZv+JaICIYX3sVlzAX1j5gCpu670zpKXsBAF7QO69tbbVQiTCE8qA\nX8ToQRlBFYHvaug6d1aq5A8M6jhE9kr3BjuoF0Ly9apnBySLkDH8jEemihmxzx5o\nhv7qwmMojQKBgQCCfbBjnhzNXuio39AWDVy+vbY8wBKJ58PYeXuKcCfg7aUwh2r1\nQ3Tj/MrVC4g5vsjlUgfxFGbhl5mW8yRUJ8X+pJtSqY/TTyfACf5LNevB4NtdQltp\nMQEy2QpzRjgAuDKP4aTlrGiFLPXO+n3ygTcn8+ZvVTevHwVI2/KVoZxFaQKBgQDD\nj/yD4CLgE2fpBcpGpupOTal/9NNyfe+fzzha8qgJK5T62SBJ0+uTiHIcosE/uEMM\noCHRm/VMt78yxAY7G74gX9xE6GeMMDxU/M5LzOJzQ3M0DsnodgxGtbYLm2mDqSUx\nrR4tWdehADJG/KkeL2uzZBEyB62gRQ/w8j4C2J3ohQKBgQDBBNUL9eucJZ7RnY4L\nT9UpgEK4kRHZTb4QTe2lZ6yqvUdyhCvjfe58uzK9kcMH4gZK0Dka+FeJNfi/cwQn\n9PeMd5FWI4v2EeAfcU9kb7JCimpVu6h2IB3dmx76wG+ytvLcmhSZxD98m8C34RKu\nKNPCib62RyNWUhWg8ZzlmG28lA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "bubui-storage@proud-curve-330320.iam.gserviceaccount.com",
+  "client_id": "110566968215520603334",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bubui-storage%40proud-curve-330320.iam.gserviceaccount.com"
+}
