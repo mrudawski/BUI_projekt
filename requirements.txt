@@ -2,6 +2,7 @@ amqp==5.0.6
 anyjson==0.3.3
 asgiref==3.3.2
 billiard==3.6.4.0
+boto3==1.19.12
 celery
 certifi==2020.12.5
 chardet==4.0.0
