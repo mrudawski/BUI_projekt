@@ -243,14 +243,7 @@ def users_list(request):
     user = get_user_model()
     users = user.objects.all()
 
-    lead_cnt = []
-    subjects_cnt = []
-
-    for i in users:
-        lead_cnt.append(Event.objects.filter(organizer=i.id).count())
-        subjects_cnt.append(Subject.objects.filter(proposer=i.id).count())
-
-    context = {'users': users, 'lead_cnt': lead_cnt, 'subjects_cnt': subjects_cnt}
+    context = {'users': users}
 
     return render(request, 'schedule/users_list.html', context)
 
@@ -261,13 +254,11 @@ def user_details(request, index):
         user = get_user_model()
         selected_user = user.objects.filter(id=index)
 
-        subjects = Subject.objects.filter(proposer=index)
         events = Event.objects.filter(organizer=index)
 
-        subjects_cnt = subjects.count()
         events_cnt = events.count()
 
-        context = {'selected_user': selected_user, 'subjects': subjects, 'events': events, 'subjects_cnt': subjects_cnt, 'events_cnt': events_cnt}
+        context = {'selected_user': selected_user, 'events': events, 'events_cnt': events_cnt}
         return render(request, 'schedule/user_details.html', context)
 
 
@@ -479,10 +470,8 @@ def delete_event(request, index):
 def my_profile(request):
 
     my_events = Event.objects.filter(organizer=request.user)
-    my_subjects = Subject.objects.filter(proposer=request.user)
 
     events_cnt = my_events.count()
-    subjects_cnt = my_subjects.count()
 
     if request.method == 'POST' and request.POST.get('change_profile') == '1':
 
@@ -509,7 +498,7 @@ def my_profile(request):
     for field in form.fields.values():
         field.help_text = None
 
-    context = {'my_events': my_events, 'my_subjects': my_subjects, 'events_cnt': events_cnt, 'subjects_cnt': subjects_cnt, 'form': form }
+    context = {'my_events': my_events, 'events_cnt': events_cnt, 'form': form }
 
     return render(request, 'schedule/my_profile.html', context)
 
