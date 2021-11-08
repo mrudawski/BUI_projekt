@@ -26,13 +26,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'xc^gh9txa63%ha^o3k^%)q*np=gsx_e@o2@)$*&@4c$gefx441'
+SECRET_KEY = os.environ['SECRET_KEY']
 # VARIABLES FOR DECODING/ENCODING EMAIL PASSWORD
-KEY = b'\xb5\xabSG\xf2~]\x99'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+if os.environ['DEBUG'] == "1":
+    DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -99,12 +101,12 @@ WSGI_APPLICATION = 'scheduler_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '34.116.229.207',
-        'PORT': '3306',
-        'NAME': 'buibui-db',
-        'USER': 'buibui',
-        'PASSWORD': '5dYD9FgPraqB2Nnk',
+        'ENGINE': os.environ['DB_ENGINE'],
+        'HOST': os.environ['DB_HOST'],
+        'PORT': os.environ['DB_PORT'],
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
         'OPTIONS': {
             'autocommit': False,
         },
@@ -123,8 +125,8 @@ STATICFILES_DIRS = [
 # Media storage config
 
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-GS_PROJECT_ID = 'proud-curve-330320'
-GS_BUCKET_NAME = 'buibui-storage'
+GS_PROJECT_ID = os.environ['GS_PROJECT_ID']
+GS_BUCKET_NAME = os.environ['GS_BUCKET_NAME']
 MEDIA_URL = 'https://storage.googleapis.com/buibui-storage/'
 GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
     os.path.join(BASE_DIR, 'proud-curve-330320-b8462665dab0.json')
