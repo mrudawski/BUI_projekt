@@ -11,8 +11,10 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
       - run:
-          name: Run tests
-          command: pytest
+          name: Running tests
+          command: |
+            . venv/bin/activate
+            python3 manage.py test
 workflows:
   test-and-deploy:
     jobs:
