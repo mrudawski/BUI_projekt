@@ -51,25 +51,21 @@ def login_page(request):
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == 'POST':
-        print('54')
+
         username = request.POST.get('username')  # html name="username"
         password = request.POST.get('password')
         remember_me = request.POST.get('remember_me')
 
         if not remember_me:
             request.session.set_expiry(0)
-        print('61')
+
         user = authenticate(request, username=username, password=password)
-        print('63')
-        print(user)
+
         # Sprawdzanie parametru next, by móc przekierować niezalogowanego użytkownika
         # w miejsce do którego chciał się dostać po poprawnym logowaniu
         if user is not None:
-            print('67')
             login(request, user)
-            print('69')
             if 'next' in request.POST:
-                print('72')
                 if not remember_me:
                     request.session.set_expiry(0)
 
@@ -77,7 +73,6 @@ def login_page(request):
             else:
                 return redirect('home')
         else:
-            print('80')
             messages.info(request, 'Nazwa użytkownika lub hasło są nieprawidłowe')
 
     context = {}
@@ -87,11 +82,8 @@ def login_page(request):
 @unauthenticated_user
 def register_page(request):
     if request.method == 'POST':
-        print('90')
         form = CreateUserForm(request.POST)
-        print('92')
         if form.is_valid():
-            print('94')
             user = form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
@@ -482,9 +474,7 @@ def my_profile(request):
 
     events_cnt = my_events.count()
     #subjects_cnt = my_subjects.count()
-
     if request.method == 'POST' and request.POST.get('change_profile') == '1':
-
         user = get_user_model()
 
         first_name = request.POST.get('first_name')
@@ -562,10 +552,8 @@ def event_details(request, index):
 
         return render(request, 'schedule/event_details.html', context)
     if request.method == 'POST' and request.POST.get('delete') is None:
-        print('566')
+        pass
     if request.method == 'POST' and request.POST.get('new_content'):
-        print(request.POST.get('new_content'))
-        print('============')
         comment_id = request.POST.get('comment_id')
         new_content = request.POST.get('new_content')
         form = AddComment()
@@ -580,7 +568,6 @@ def event_details(request, index):
         return redirect('event_details', index)
 
     if request.method == 'POST' and request.POST.get('delete'):
-        print('584')
         comment_id = request.POST.get('comment_id')
 
         delete_comment = Comment.objects.filter(id=comment_id).update(if_deleted=True)
@@ -602,12 +589,6 @@ def event_details(request, index):
         event = Event.objects.filter(id=index)[0]
         created = datetime.now()
         content = request.POST.get('content')
-        print('+!+!+!+!')
-        print(request.POST.get('new_content'))
-        print(type(request.POST.get('new_content')))
-        print(request.POST.get('delete'))
-        print(type(request.POST.get('delete')))
-        print(content)
         form = Comment(author=author, event=event, created=created, content=content)
         form.save()
 

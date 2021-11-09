@@ -6,6 +6,7 @@ from schedule.models import Event, Comment
 from django.contrib.auth.models import User
 import json
 from schedule.forms import CreateUserForm
+from django.contrib.auth.models import Group
 
 
 class TestViews(TestCase):
@@ -20,9 +21,12 @@ class TestViews(TestCase):
         self.about_url = reverse('about')
         self.users_list_url = reverse('users_list')
         self.user_details_url = reverse('user_details', args=[1])
+        self.user_edit_url = reverse('user_edit', args=[1])
         # poniżej zakładamy, że istnieje event o indeksie 1 ale nie zawsze będzie to prawdą
         # dlatego należy utworzyć obiekt Event o takim indeksie do testów
-        self.event_details_url = reverse('event_details', args=['1'])
+        self.event_edit_url = reverse('event_edit', args=['1'])
+        self.event_details_url = reverse('event_details', args=[1])
+        self.my_profile_url = reverse('my_profile')
         self.user1 = User.objects.create(
             username='Username',
             first_name='Jhon',
@@ -30,6 +34,7 @@ class TestViews(TestCase):
             email='example@com',
             password='Password'
         )
+
         self.event1 = Event.objects.create(
             title='Title',
             slug='Slug',
@@ -77,7 +82,7 @@ class TestViews(TestCase):
         self.assertEquals(response.status_code, 200)
 
     def test_register_page_POST(self):
-        print('73')
+
         response = self.client.post(self.register_page_url, {
             'username': self.user1.username,
             'password': self.user1.password,
@@ -133,12 +138,31 @@ class TestViews(TestCase):
         self.assertEquals(response.status_code, 302)
         #self.assertTemplateUsed(response, 'schedule/user_edit.html')
 
+    def test_event_edit_GET(self):
+
+        response = self.client.get(self.event_edit_url)
+        self.assertEquals(response.status_code, 302)
+
+    def test_my_profile_POST_change_profile(self):
+        group = Group.objects.get(name='employee')
+        self.user1.groups.add(group)
+        response = self.client.post(self.my_profile_url, {
+            'user': self.user1,
+            'organizer': self.user1,
+            'change_profile': '1'
+        })
+
+        self.assertEquals(response.status_code, 302)
+
+
+
     def test_event_detail_GET(self):
 
         response = self.client.get(self.event_details_url)
 
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'schedule/event_details.html')
+
 
     def test_event_detail_POST_new_comment(self):
         Comment.objects.create(
@@ -156,7 +180,6 @@ class TestViews(TestCase):
             #'event': self.event1,
             #'created': datetime.datetime.now()
         })
-        print(response)
         #self.assertEquals(response.status_code, 200)
 
     # def test_event_detail_POST_new_content(self):
