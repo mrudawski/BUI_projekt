@@ -238,12 +238,14 @@ def users_list(request):
     user = get_user_model()
     users = user.objects.all()
 
+
     lead_cnt = []
 
     for i in users:
         lead_cnt.append(Event.objects.filter(organizer=i.id).count())
 
     context = {'users': users, 'lead_cnt': lead_cnt}
+
 
     return render(request, 'schedule/users_list.html', context)
 
@@ -470,10 +472,9 @@ def delete_event(request, index):
 def my_profile(request):
 
     my_events = Event.objects.filter(organizer=request.user)
-    #my_subjects = Subject.objects.filter(proposer=request.user)
 
     events_cnt = my_events.count()
-    #subjects_cnt = my_subjects.count()
+
     if request.method == 'POST' and request.POST.get('change_profile') == '1':
         user = get_user_model()
 

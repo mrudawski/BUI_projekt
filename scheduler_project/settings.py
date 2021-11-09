@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 import pymysql
+from schedule import storage_backends
+from google.oauth2 import service_account
 
 pymysql.install_as_MySQLdb()
 
@@ -24,13 +26,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'xc^gh9txa63%ha^o3k^%)q*np=gsx_e@o2@)$*&@4c$gefx441'
+SECRET_KEY = os.environ['SECRET_KEY']
 # VARIABLES FOR DECODING/ENCODING EMAIL PASSWORD
-KEY = b'\xb5\xabSG\xf2~]\x99'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+if os.environ['DEBUG'] == "1":
+    DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -68,6 +72,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'scheduler_project.urls'
 
+# Templates
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -86,51 +92,44 @@ TEMPLATES = [
     },
 ]
 
+# Wgsi application
+
 WSGI_APPLICATION = 'scheduler_project.wsgi.application'
 
-if os.environ.get('DOCKERIZE'):
+# Database backend details
 
-    CELERY = {
-        'BROKER_URL': os.environ['CELERY_BROKER'],
-        'CELERY_IMPORTS': ('scheduler_project.tasks', ),
+DATABASES = {
+    'default': {
+        'ENGINE': os.environ['DB_ENGINE'],
+        'HOST': os.environ['DB_HOST'],
+        'PORT': os.environ['DB_PORT'],
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'OPTIONS': {
+            'autocommit': False,
+        },
     }
+}
 
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'mysql',
-            'PORT': '3306',
-            'NAME': 'scheduler_database',
-            'USER': 'root',
-            'PASSWORD': 'schedulerdbroot',
-            'OPTIONS': {
-                'autocommit': False,
-            },
-        }
-    }
+# Static storage config
 
-else:
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '34.116.229.207',
-            'PORT': '3306',
-            'NAME': 'buibui-db',
-            'USER': 'buibui',
-            'PASSWORD': '5dYD9FgPraqB2Nnk',
-            'OPTIONS': {
-                'autocommit': False,
-            },
-        }
-    }
-
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]
+
+# Media storage config
+
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_PROJECT_ID = os.environ['GS_PROJECT_ID']
+GS_BUCKET_NAME = os.environ['GS_BUCKET_NAME']
+MEDIA_URL = 'https://storage.googleapis.com/buibui-storage/'
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    os.path.join(BASE_DIR, 'proud-curve-330320-b8462665dab0.json')
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -162,15 +161,3 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = False
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-# STATIC_URL = '/static/'
-# STATIC_ROOT = 'static'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
-
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
