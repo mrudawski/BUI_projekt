@@ -38,7 +38,6 @@ class ChangePassword(PasswordChangeForm):
         'passwords_match': ("Nowe hasło nie może być takie samo jak poprzednie"),
     })
 
-
     def clean_new_password1(self):
         old_pass = self.cleaned_data.get('old_password')
         new_pass = self.cleaned_data.get('new_password1')
@@ -49,8 +48,9 @@ class ChangePassword(PasswordChangeForm):
                 )
         return new_pass
 
+
 #@allowed_users(allowed_roles=['admin', 'employee'])
 class AddComment(ModelForm):
     class Meta:
         model = Comment
-        fields = ('author','event','content','if_edited','if_deleted')
+        fields = ('author', 'event', 'content', 'if_edited', 'if_deleted')

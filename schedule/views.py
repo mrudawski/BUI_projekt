@@ -51,21 +51,25 @@ def login_page(request):
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == 'POST':
+        print('54')
         username = request.POST.get('username')  # html name="username"
         password = request.POST.get('password')
         remember_me = request.POST.get('remember_me')
 
         if not remember_me:
             request.session.set_expiry(0)
-
+        print('61')
         user = authenticate(request, username=username, password=password)
-
+        print('63')
+        print(user)
         # Sprawdzanie parametru next, by móc przekierować niezalogowanego użytkownika
         # w miejsce do którego chciał się dostać po poprawnym logowaniu
         if user is not None:
+            print('67')
             login(request, user)
+            print('69')
             if 'next' in request.POST:
-
+                print('72')
                 if not remember_me:
                     request.session.set_expiry(0)
 
@@ -73,6 +77,7 @@ def login_page(request):
             else:
                 return redirect('home')
         else:
+            print('80')
             messages.info(request, 'Nazwa użytkownika lub hasło są nieprawidłowe')
 
     context = {}
@@ -82,9 +87,11 @@ def login_page(request):
 @unauthenticated_user
 def register_page(request):
     if request.method == 'POST':
+        print('90')
         form = CreateUserForm(request.POST)
+        print('92')
         if form.is_valid():
-
+            print('94')
             user = form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
@@ -228,10 +235,6 @@ def about(request):
     return render(request, 'schedule/about.html')
 
 
-def user_page(request):
-    context = {}
-    return render(request, 'schedule/user.html', context)
-
 @allowed_users(allowed_roles=['admin'])
 def users_list(request):
     if request.method == 'POST':
@@ -244,13 +247,11 @@ def users_list(request):
     users = user.objects.all()
 
     lead_cnt = []
-    subjects_cnt = []
 
     for i in users:
         lead_cnt.append(Event.objects.filter(organizer=i.id).count())
-        subjects_cnt.append(Subject.objects.filter(proposer=i.id).count())
 
-    context = {'users': users, 'lead_cnt': lead_cnt, 'subjects_cnt': subjects_cnt}
+    context = {'users': users, 'lead_cnt': lead_cnt}
 
     return render(request, 'schedule/users_list.html', context)
 
@@ -261,13 +262,11 @@ def user_details(request, index):
         user = get_user_model()
         selected_user = user.objects.filter(id=index)
 
-        subjects = Subject.objects.filter(proposer=index)
         events = Event.objects.filter(organizer=index)
 
-        subjects_cnt = subjects.count()
         events_cnt = events.count()
 
-        context = {'selected_user': selected_user, 'subjects': subjects, 'events': events, 'subjects_cnt': subjects_cnt, 'events_cnt': events_cnt}
+        context = {'selected_user': selected_user, 'events': events, 'events_cnt': events_cnt}
         return render(request, 'schedule/user_details.html', context)
 
 
@@ -331,7 +330,7 @@ def event_edit(request, index):
             user = get_user_model()
             users = user.objects.all()
 
-            context = {'event': event, 'users': users, 'permitted': True,}
+            context = {'event': event, 'users': users, 'permitted': True}
             return render(request, 'schedule/event_edit.html', context)
 
         if request.method == 'POST':
@@ -479,10 +478,10 @@ def delete_event(request, index):
 def my_profile(request):
 
     my_events = Event.objects.filter(organizer=request.user)
-    my_subjects = Subject.objects.filter(proposer=request.user)
+    #my_subjects = Subject.objects.filter(proposer=request.user)
 
     events_cnt = my_events.count()
-    subjects_cnt = my_subjects.count()
+    #subjects_cnt = my_subjects.count()
 
     if request.method == 'POST' and request.POST.get('change_profile') == '1':
 
@@ -509,7 +508,7 @@ def my_profile(request):
     for field in form.fields.values():
         field.help_text = None
 
-    context = {'my_events': my_events, 'my_subjects': my_subjects, 'events_cnt': events_cnt, 'subjects_cnt': subjects_cnt, 'form': form }
+    context = {'my_events': my_events, 'events_cnt': events_cnt, 'form': form }
 
     return render(request, 'schedule/my_profile.html', context)
 
@@ -562,9 +561,11 @@ def event_details(request, index):
         context = {'selected_event': selected_event, 'comments': comments, 'form': form, 'comments_cnt': comments_cnt}
 
         return render(request, 'schedule/event_details.html', context)
-
+    if request.method == 'POST' and request.POST.get('delete') is None:
+        print('566')
     if request.method == 'POST' and request.POST.get('new_content'):
-
+        print(request.POST.get('new_content'))
+        print('============')
         comment_id = request.POST.get('comment_id')
         new_content = request.POST.get('new_content')
         form = AddComment()
@@ -579,7 +580,7 @@ def event_details(request, index):
         return redirect('event_details', index)
 
     if request.method == 'POST' and request.POST.get('delete'):
-
+        print('584')
         comment_id = request.POST.get('comment_id')
 
         delete_comment = Comment.objects.filter(id=comment_id).update(if_deleted=True)
@@ -601,7 +602,12 @@ def event_details(request, index):
         event = Event.objects.filter(id=index)[0]
         created = datetime.now()
         content = request.POST.get('content')
-
+        print('+!+!+!+!')
+        print(request.POST.get('new_content'))
+        print(type(request.POST.get('new_content')))
+        print(request.POST.get('delete'))
+        print(type(request.POST.get('delete')))
+        print(content)
         form = Comment(author=author, event=event, created=created, content=content)
         form.save()
 
