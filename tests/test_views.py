@@ -154,15 +154,12 @@ class TestViews(TestCase):
 
         self.assertEquals(response.status_code, 302)
 
-
-
     def test_event_detail_GET(self):
 
         response = self.client.get(self.event_details_url)
 
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'schedule/event_details.html')
-
 
     def test_event_detail_POST_new_comment(self):
         Comment.objects.create(
