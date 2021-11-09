@@ -11,8 +11,15 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
       - run:
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      - run:
           name: Running tests
-          command: python3 manage.py test
+          command: |
+            . venv/bin/activate
+            python3 manage.py test
 workflows:
   test-and-deploy:
     jobs:
