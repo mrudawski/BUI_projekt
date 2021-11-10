@@ -8,8 +8,11 @@ jobs:
       - image: cimg/python:3.8
     steps:
       - checkout
-      - python/install-packages:
-          pkg-manager: pip
+      - run:
+          name: Setup testing environment
+          command: |
+            pip install '.[test]' --user
+            echo $HOME
       - run:
           name: Run Tests
           command: |
