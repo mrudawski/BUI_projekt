@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Run Tests
           command: |
-            coverage run --source="." manage.py test
+            coverage run --source="." manage.py test --noinput
             coverage report
             coverage html
       - store_artifacts:
