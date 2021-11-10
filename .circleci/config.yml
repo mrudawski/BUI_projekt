@@ -15,15 +15,13 @@ jobs:
             echo $HOME
       - run:
           command: |
-            # get test files while ignoring __init__ files
-            TESTFILES=$(circleci tests glob "catalog/tests/*.py" | sed 's/\S\+__init__.py//g')
-            echo $TESTFILES | tr ' ' '\n' | sort | uniq > circleci_test_files.txt
-            cat circleci_test_files.txt
-            TESTFILES=$(circleci tests split --split-by=timings circleci_test_files.txt)
-            # massage filepaths into format manage.py test accepts
-            TESTFILES=$(echo $TESTFILES | tr "/" "." | sed 's/.py//g')
-            echo $TESTFILES
-            pipenv run python manage.py test --verbosity=2 $TESTFILES
+          TESTFILES=$(circleci tests glob "catalog/tests/*.py" | sed 's/\S\+__init__.py//g')
+          echo $TESTFILES | tr ' ' '\n' | sort | uniq > circleci_test_files.txt
+          cat circleci_test_files.txt
+          TESTFILES=$(circleci tests split --split-by=timings circleci_test_files.txt)
+          TESTFILES=$(echo $TESTFILES | tr "/" "." | sed 's/.py//g')
+          echo $TESTFILES
+          python manage.py test --verbosity=2 $TESTFILES
 workflows:
   test-and-deploy:
     jobs:
