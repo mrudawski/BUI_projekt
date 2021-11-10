@@ -16,9 +16,9 @@ jobs:
       - run:
           name: Run Tests
           command: |
-            $HOME/.local/bin/coverage run --source="." manage.py test
-            $HOME/.local/bin/coverage report
-            $HOME/.local/bin/coverage html
+            coverage run --source="." manage.py test
+            coverage report
+            coverage html
       - store_artifacts:
           path: htmlcov
 workflows:
