@@ -106,8 +106,11 @@ DATABASES = {
         'NAME': os.environ['DB_NAME'],
         'USER': os.environ['DB_USER'],
         'PASSWORD': os.environ['DB_PASSWORD'],
+        'TEST': {
+            'NAME': 'test_buibui-db',
+        },
         'OPTIONS': {
-            'autocommit': False,
+            'autocommit': True,
         },
     }
 }
