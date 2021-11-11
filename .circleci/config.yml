@@ -32,7 +32,7 @@ jobs:
           path: htmlcov
       - coverage-reporter/send_report:
           coverage-reports: 'report.xml,coverage.info'
-          project-token: $CODACY_PROJECT_TOKEN
+          project-token: $CODACY_API_TOKEN
 workflows:
   test-and-deploy:
     jobs:
