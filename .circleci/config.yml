@@ -21,7 +21,7 @@ jobs:
             TESTFILES=$(circleci tests split --split-by=timings circleci_test_files.txt)
             TESTFILES=$(echo $TESTFILES | tr "/" "." | sed 's/.py//g')
             echo $TESTFILES
-            coverage run --source="." manage.py test --noinput --verbosity=2 $TESTFILES
+            coverage run --source="." manage.py test --noinput --verbosity=2 --nomigrations
 workflows:
   test-and-deploy:
     jobs:
