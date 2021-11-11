@@ -2,10 +2,12 @@ version: 2.1
 orbs:
   python: circleci/python@1.2
   heroku: circleci/heroku@0.0.10
+  coverage-reporter: codacy/coverage-reporter@13.5.2
 jobs:
   build-and-test:
     docker:
       - image: cimg/python:3.8
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - run:
@@ -24,10 +26,13 @@ jobs:
             echo $TESTFILES
             coverage run --source="." manage.py test --noinput --verbosity=2 --keepdb --debug-mode
             coverage report
+            coverage xml
             coverage html
-            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r . --api-token e5c4923316354e1baab8fa6baa8665f8
       - store_artifacts:
           path: htmlcov
+      - coverage-reporter/send_report:
+          coverage-reports: 'report.xml,coverage.info'
+          project-token: $CODACY_PROJECT_TOKEN
 workflows:
   test-and-deploy:
     jobs:
@@ -35,3 +40,4 @@ workflows:
       - heroku/deploy-via-git:
           requires:
             - build-and-test
+
