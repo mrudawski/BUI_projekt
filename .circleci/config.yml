@@ -31,7 +31,7 @@ jobs:
       - store_artifacts:
           path: htmlcov
       - coverage-reporter/send_report:
-          coverage-reports: 'report.xml,coverage.info'
+          coverage-reports: 'coverage.xml'
           project-token: $CODACY_API_TOKEN
 workflows:
   test-and-deploy:
