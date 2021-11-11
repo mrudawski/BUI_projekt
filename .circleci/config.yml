@@ -25,7 +25,7 @@ jobs:
             coverage run --source="." manage.py test --noinput --verbosity=2 --keepdb --debug-mode
             coverage report
             coverage html
-            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r .
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r . --organization-provider gh
       - store_artifacts:
           path: htmlcov
 workflows:
