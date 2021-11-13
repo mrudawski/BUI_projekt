@@ -1,6 +1,5 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_migrate, post_migrate
-from .models import Event
+from django.db.models.signals import post_migrate
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 

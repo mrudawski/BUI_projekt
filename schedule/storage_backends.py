@@ -1,4 +1,5 @@
 """
+
 GoogleCloudStorage extensions suitable for handing Django's
 Static and Media files.
 

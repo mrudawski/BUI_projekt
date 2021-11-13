@@ -1,9 +1,5 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
-from schedule.views import home_page, events_list, register_page
-from django.contrib.auth.models import User
-from django.test import SimpleTestCase
-from django.urls import reverse, resolve
 from schedule.views import home_page, events_list, register_page, login_page, logout_user, create_event, about, password_reset_request, \
     users_list, my_profile, handler_403, user_details, user_edit, delete_user, event_edit, delete_event, event_details
 

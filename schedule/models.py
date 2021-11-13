@@ -1,13 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.text import slugify
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.dispatch import receiver
-from django.db.models.signals import post_migrate
-from django.contrib.auth import get_user_model
-
 
 class Event(models.Model):
     STATUS_CHOICES = (

@@ -1,7 +1,5 @@
 from django import template
 from django.contrib.auth.models import Group
-from datetime import datetime
-from ..models import Event
 
 register = template.Library()
 

@@ -1,13 +1,10 @@
-import django.contrib.auth.views
 from django.contrib import admin
 from django.urls import path
 from . import views
 from django.views.static import serve
-
-from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls import url
-from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
+from django.contrib.auth.views import PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
 
 urlpatterns = [

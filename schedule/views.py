@@ -1,7 +1,4 @@
-import scheduler_project.settings
-from .forms import CreateUserForm, UserFullnameChoiceField
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from .forms import CreateUserForm
 from .forms import CreateEvent
 from .forms import AddComment
@@ -11,32 +8,18 @@ from datetime import datetime, date
 from django.contrib.auth.models import Group
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from .models import Event, User, Comment
-from django.core.mail import send_mail, get_connection, send_mass_mail
+from django.core.mail import get_connection
 from django.core.mail import EmailMessage
 from django.utils import timezone
-import pytz
-from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator, EmptyPage
-from django.template.loader import get_template, render_to_string
-import os
+from django.template.loader import render_to_string
 from .forms import ChangePassword
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
-from django.conf import settings
-from django.http import HttpResponse
 from django.db.models import Q
-from django.core.mail import BadHeaderError, send_mail
-from django.template import loader
-from collections import Counter
-from Crypto.Cipher import DES
-from django.contrib.messages import get_messages
-
 
 def home_page(request):
     now = timezone.now()
@@ -189,7 +172,7 @@ def events_list(request):
                 context = {'list': page, 'fullnames': fullnames, 'draft_success': draft_success}
                 return render(request, 'schedule/events_list.html', context)
     except:
-        pass
+        print("Error occured")
 
     context = {'list': page, 'fullnames': fullnames}
 
@@ -203,9 +186,6 @@ def create_event(request):
         form = CreateEvent(request.POST, request.FILES)
         if form.is_valid():
             organizer = form.cleaned_data.get('organizer')
-            event_form = form.save()
-            event_pk = event_form.pk
-            organizer_pk = get_object_or_404(User, username=organizer).pk
             request.session['ref_times'] = 0
             request.session['event_success'] = True
             return redirect('events_list')
@@ -293,8 +273,6 @@ def user_edit(request, index):
             admin_group = Group.objects.get(name='admin')
             admin_group.user_set.remove(index)
             employee_group.user_set.add(index)
-
-        update_user = user.objects.filter(id=index).update(first_name=first_name, last_name=last_name, username=username, email=email)
 
         return redirect('users_list')
 
@@ -410,7 +388,6 @@ def event_edit(request, index):
                             poll_status = 'not_started'
                         dates = Dates.objects.filter(poll=poll).order_by('date')
                         total_votes = 0
-                        if_voted = False
                         # sprawdzam czy user juz zaglosowal na ktorykolwiek z terminow
                         for el in dates:
                             if el.users.filter(id=request.user.id).exists():
@@ -482,7 +459,7 @@ def my_profile(request):
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
 
-        update_user = user.objects.filter(id=request.user.id).update(first_name=first_name, last_name=last_name, email=email)
+        #update_user = user.objects.filter(id=request.user.id).update(first_name=first_name, last_name=last_name, email=email)
 
         return redirect('my_profile')
 
@@ -558,7 +535,6 @@ def event_details(request, index):
         comment_id = request.POST.get('comment_id')
         new_content = request.POST.get('new_content')
         form = AddComment()
-        update_comment = Comment.objects.filter(id=comment_id).update(content=new_content, if_edited=True)
         selected_event = Event.objects.filter(id=index)
         comments = Comment.objects.filter(event=index)
         comments_cnt = comments.count()
@@ -571,7 +547,7 @@ def event_details(request, index):
     if request.method == 'POST' and request.POST.get('delete'):
         comment_id = request.POST.get('comment_id')
 
-        delete_comment = Comment.objects.filter(id=comment_id).update(if_deleted=True)
+        #delete_comment = Comment.objects.filter(id=comment_id).update(if_deleted=True)
 
         form = AddComment()
         selected_event = Event.objects.filter(id=index)

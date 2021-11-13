@@ -2,12 +2,9 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
-from django.db import models
 from .models import Event, Comment
 import datetime
-from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
-from .decorators import unauthenticated_user, allowed_users
-
+from django.contrib.auth.forms import PasswordChangeForm
 
 class UserFullnameChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):

@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 import pymysql
-from schedule import storage_backends
 from google.oauth2 import service_account
 
 pymysql.install_as_MySQLdb()

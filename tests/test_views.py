@@ -1,10 +1,8 @@
 import datetime
-from django import forms
 from django.test import TestCase, Client
 from django.urls import reverse
 from schedule.models import Event, Comment
 from django.contrib.auth.models import User
-import json
 from schedule.forms import CreateUserForm
 from django.contrib.auth.models import Group
 
