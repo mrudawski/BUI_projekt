@@ -20,6 +20,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 def home_page(request):
     now = timezone.now()
@@ -172,7 +173,7 @@ def events_list(request):
                 context = {'list': page, 'fullnames': fullnames, 'draft_success': draft_success}
                 return render(request, 'schedule/events_list.html', context)
     except:
-        print("Error occured")
+        pass
 
     context = {'list': page, 'fullnames': fullnames}
 
@@ -186,6 +187,9 @@ def create_event(request):
         form = CreateEvent(request.POST, request.FILES)
         if form.is_valid():
             organizer = form.cleaned_data.get('organizer')
+            event_form = form.save()
+            event_pk = event_form.pk
+            organizer_pk = get_object_or_404(User, username=organizer).pk
             request.session['ref_times'] = 0
             request.session['event_success'] = True
             return redirect('events_list')
@@ -273,7 +277,8 @@ def user_edit(request, index):
             admin_group = Group.objects.get(name='admin')
             admin_group.user_set.remove(index)
             employee_group.user_set.add(index)
-
+        update_user = user.objects.filter(id=index).update(first_name=first_name, last_name=last_name,
+                                                           username=username, email=email)
         return redirect('users_list')
 
     return render(request, 'schedule/user_edit.html', context)
