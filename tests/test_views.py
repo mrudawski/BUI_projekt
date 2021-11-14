@@ -166,11 +166,5 @@ class TestViews(TestCase):
         )
 
         response = self.client.post(self.event_details_url, data={
-            # 'new_content': '',
-            # 'delete': '',
             'delete': 'Nones'
-            # 'author': self.user1,
-            # 'event': self.event1,
-            # 'created': datetime.datetime.now()
         })
-        # self.assertEquals(response.status_code, 200)
