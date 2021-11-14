@@ -22,6 +22,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+
 def home_page(request):
     now = timezone.now()
     upcoming_events_list = Event.objects.filter(planning_date__gte=now)
@@ -45,8 +46,6 @@ def login_page(request):
 
         user = authenticate(request, username=username, password=password)
 
-        # Sprawdzanie parametru next, by móc przekierować niezalogowanego użytkownika
-        # w miejsce do którego chciał się dostać po poprawnym logowaniu
         if user is not None:
             login(request, user)
             if 'next' in request.POST:
@@ -143,12 +142,6 @@ def events_list(request):
 
     # FILTROWANIE
 
-
-
-
-
-
-
     pa = Paginator(all_events_list, 12)
 
     page_num = request.GET.get('page', 1)
@@ -157,7 +150,6 @@ def events_list(request):
     except EmptyPage:
         page = pa.page(1)
 
-    # wyswietalnie informacji o dodaniu szkolenia/szkicu
     try:
         request.session['ref_times'] += 1
         if request.session.get('ref_times') == 2:
@@ -178,6 +170,7 @@ def events_list(request):
     context = {'list': page, 'fullnames': fullnames}
 
     return render(request, 'schedule/events_list.html', context)
+
 
 @allowed_users(allowed_roles=['admin'])
 def create_event(request):
@@ -201,6 +194,7 @@ def create_event(request):
 
     return render(request, 'schedule/create_event.html', context)
 
+
 @login_required(login_url='login')
 def logout_user(request):
     logout(request)
@@ -222,14 +216,12 @@ def users_list(request):
     user = get_user_model()
     users = user.objects.all()
 
-
     lead_cnt = []
 
     for i in users:
         lead_cnt.append(Event.objects.filter(organizer=i.id).count())
 
     context = {'users': users, 'lead_cnt': lead_cnt}
-
 
     return render(request, 'schedule/users_list.html', context)
 
@@ -251,7 +243,7 @@ def user_details(request, index):
 @allowed_users(allowed_roles=['admin'])
 def user_edit(request, index):
 
-
+    context = []
     if request.method == 'GET':
         user = get_user_model()
         selected_user = user.objects.filter(id=index)
@@ -295,7 +287,8 @@ def delete_user(request, index):
     except:
         return redirect('users_list')
 
-    return render(request, 'schedule/users_list.html')
+    #return render(request, 'schedule/users_list.html')
+
 
 @allowed_users(allowed_roles=['admin', 'employee'])
 def event_edit(request, index):
@@ -376,24 +369,15 @@ def event_edit(request, index):
 
                     if poll:
                         poll_exist = True
-                        # w trakcie
                         poll_status = ''
                         if poll.since_active <= date.today() < poll.till_active:
                             poll_status = 'in_progress'
-                            # poll_in_progress = True
-                        # else:
-                        #     poll_in_progress = False
-                        # zakonczona
                         elif poll.till_active < date.today():
-                            # poll_ended = True
                             poll_status = 'ended'
-                        # nierozpoczeta
                         elif poll.since_active > date.today():
-                            # poll_not_started = True
                             poll_status = 'not_started'
                         dates = Dates.objects.filter(poll=poll).order_by('date')
                         total_votes = 0
-                        # sprawdzam czy user juz zaglosowal na ktorykolwiek z terminow
                         for el in dates:
                             if el.users.filter(id=request.user.id).exists():
                                 if_voted = True
@@ -406,8 +390,6 @@ def event_edit(request, index):
                                'poll_in_progress': poll_in_progress, 'poll_exist': poll_exist,
                                'poll_status': poll_status, 'total_votes': total_votes}
                     return render(request, 'schedule/event_edit.html', context)
-                    # context = {'event': event, 'past': past}
-                    # return render(request, 'schedule/event_edit.html', context)
 
                 if request.method == 'POST':
 
@@ -464,8 +446,6 @@ def my_profile(request):
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
 
-        #update_user = user.objects.filter(id=request.user.id).update(first_name=first_name, last_name=last_name, email=email)
-
         return redirect('my_profile')
 
     elif request.method == 'POST':
@@ -486,7 +466,6 @@ def my_profile(request):
     return render(request, 'schedule/my_profile.html', context)
 
 
-#@allowed_users(allowed_roles=['admin', 'employee'])
 def event_details(request, index):
 
     if request.method == 'GET':
@@ -503,22 +482,18 @@ def event_details(request, index):
 
         if poll:
             poll_exist = True
-            # w trakcie
             poll_status = ''
             if poll.since_active is None or poll.till_active is None:
                 poll_status = 'not_set'
             elif poll.since_active <= date.today() <= poll.till_active:
                 poll_status = 'in_progress'
-            # zakonczona
             elif poll.till_active < date.today():
                 poll_status = 'ended'
-            # nierozpoczeta
             elif poll.since_active > date.today():
                 poll_status = 'not_started'
             dates = Dates.objects.filter(poll=poll).order_by('date')
             total_votes = 0
             if_voted = False
-            # sprawdzam czy user juz zaglosowal na ktorykolwiek z terminow
             for el in dates:
                 if el.users.filter(id=request.user.id).exists():
                     if_voted = True
@@ -552,8 +527,6 @@ def event_details(request, index):
     if request.method == 'POST' and request.POST.get('delete'):
         comment_id = request.POST.get('comment_id')
 
-        #delete_comment = Comment.objects.filter(id=comment_id).update(if_deleted=True)
-
         form = AddComment()
         selected_event = Event.objects.filter(id=index)
         comments = Comment.objects.filter(event=index)
@@ -563,7 +536,6 @@ def event_details(request, index):
                    'comments_cnt': comments_cnt}
 
         return render(request, 'schedule/event_details.html', context)
-
 
     if request.method == 'POST' and not request.POST.get('new_content') and request.POST.get('delete') != True:
 
