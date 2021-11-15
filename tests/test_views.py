@@ -1,6 +1,4 @@
 import datetime
-from unittest import TestCase
-
 from django.test import TestCase, Client
 from django.urls import reverse
 from schedule.models import Event, Comment
