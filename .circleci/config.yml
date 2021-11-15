@@ -40,3 +40,4 @@ workflows:
       - heroku/deploy-via-git:
           requires:
             - build-and-test
+
