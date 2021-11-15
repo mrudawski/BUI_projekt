@@ -29,12 +29,10 @@ class Event(models.Model):
         self.slug = slugify(self.title)
         super(Event, self).save(*args, **kwargs)
 
-    # topics
-
     class Meta:
         ordering = ('planning_date',)
 
-    def __str__ (self):
+    def __str__(self):
         return self.title
 
 
