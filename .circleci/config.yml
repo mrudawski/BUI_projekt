@@ -38,6 +38,5 @@ workflows:
     jobs:
       - build-and-test
       - heroku/deploy-via-git:
-          force: true
           requires:
             - build-and-test
