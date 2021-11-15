@@ -2,7 +2,8 @@ from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
-
+from .models import User
+from .models import Code
 
 @receiver(post_migrate)
 def populate_models(sender, **kwargs):
@@ -19,3 +20,8 @@ def populate_models(sender, **kwargs):
         suser = User.objects.get(username='superuser')
         admin = Group.objects.get(name='admin')
         suser.groups.add(admin)
+
+@receiver(post_save, sender=User)
+def post_save_generate_code(sender, instance, created, *args, **kwargs):
+    if created:
+        Code.objects.create(user=instance)

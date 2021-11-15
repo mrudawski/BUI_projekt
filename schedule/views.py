@@ -1,4 +1,7 @@
+import scheduler_project.settings
+from .forms import CreateUserForm, UserFullnameChoiceField
 from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
 from .forms import CreateUserForm
 from .forms import CreateEvent
 from .forms import AddComment
@@ -8,58 +11,96 @@ from datetime import datetime, date
 from django.contrib.auth.models import Group
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
-from .models import Event, User, Comment
-from django.core.mail import get_connection
+from django.http import HttpResponseRedirect
+from .models import Event, User, Comment, User
+from django.core.mail import send_mail, get_connection, send_mass_mail
 from django.core.mail import EmailMessage
 from django.utils import timezone
+import pytz
+from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator, EmptyPage
-from django.template.loader import render_to_string
+from django.template.loader import get_template, render_to_string
+import os
 from .forms import ChangePassword
-from django.contrib.auth.forms import PasswordResetForm
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.forms import PasswordResetForm, AuthenticationForm
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+from django.http import HttpResponse
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.core.mail import BadHeaderError, send_mail
+from django.template import loader
+from collections import Counter
+#from Crypto.Cipher import DES
+from django.contrib.messages import get_messages
+from .forms import CodeForm
 
-
+@login_required()
 def home_page(request):
     now = timezone.now()
     upcoming_events_list = Event.objects.filter(planning_date__gte=now)
-
     context = {'upcoming_events_list': upcoming_events_list}
-
     return render(request, 'schedule/home.html', context)
 
 
+# 2FA Verify view - weryfikacja tokenu
+def verify_page(request):
+    print("VERIFY PAGE")
+    form = CodeForm(request.POST or None)
+    #remember_me = request.POST.get('remember_me')
+
+    pk = request.session.get('pk')  # Primary Key
+    print(pk)
+    user = User.objects.get(pk=pk)
+    code = user.code
+    code_user = f'{user.username}: {user.code}'
+
+    print(code_user)
+    if  not request.POST:
+        pass
+        #print(code_user)
+        #print(user.code)
+            # pass
+            # sending to the user via email/SMS
+    if form.is_valid():
+        num = form.cleaned_data.get('verification_code')
+        #if str(code) == num: # Jeśli Token poprawny
+            #code.save()
+            #return redirect('home')
+        #else:
+            #messages.info(request, 'Nazwa użytkownika, hasło, lub token są nieprawidłowe')
+    context = {}
+    return render(request, 'schedule/login.html', context)
+
 def login_page(request):
+    # For 2FA
+    print("LOGIN PAGEEEE")
+    form = CodeForm(request.POST or None)
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == 'POST':
-
         username = request.POST.get('username')  # html name="username"
         password = request.POST.get('password')
         remember_me = request.POST.get('remember_me')
-
         if not remember_me:
             request.session.set_expiry(0)
 
         user = authenticate(request, username=username, password=password)
-
+        # 2FA
         if user is not None:
-            login(request, user)
-            if 'next' in request.POST:
-                if not remember_me:
-                    request.session.set_expiry(0)
-
-                return redirect(request.POST.get('next'))
-            else:
-                return redirect('home')
-        else:
-            messages.info(request, 'Nazwa użytkownika lub hasło są nieprawidłowe')
-
+            request.session['pk'] = user.pk
+            print("LOGIN PAGE: Idziesz do VERIFY!")
+            return redirect('verify')
+            #return render(request, 'schedule/verify.html', {'form': form})
+        return render(request, 'schedule/login.html')
+    else:
+        messages.info(request, 'Nazwa użytkownika lub hasło są nieprawidłowe')
     context = {}
     return render(request, 'schedule/login.html', context)
+
 
 
 @unauthenticated_user
@@ -142,6 +183,7 @@ def events_list(request):
 
     # FILTROWANIE
 
+
     pa = Paginator(all_events_list, 12)
 
     page_num = request.GET.get('page', 1)
@@ -150,6 +192,7 @@ def events_list(request):
     except EmptyPage:
         page = pa.page(1)
 
+    # wyswietalnie informacji o dodaniu szkolenia/szkicu
     try:
         request.session['ref_times'] += 1
         if request.session.get('ref_times') == 2:
@@ -170,7 +213,6 @@ def events_list(request):
     context = {'list': page, 'fullnames': fullnames}
 
     return render(request, 'schedule/events_list.html', context)
-
 
 @allowed_users(allowed_roles=['admin'])
 def create_event(request):
@@ -194,7 +236,6 @@ def create_event(request):
 
     return render(request, 'schedule/create_event.html', context)
 
-
 @login_required(login_url='login')
 def logout_user(request):
     logout(request)
@@ -216,12 +257,14 @@ def users_list(request):
     user = get_user_model()
     users = user.objects.all()
 
+
     lead_cnt = []
 
     for i in users:
         lead_cnt.append(Event.objects.filter(organizer=i.id).count())
 
     context = {'users': users, 'lead_cnt': lead_cnt}
+
 
     return render(request, 'schedule/users_list.html', context)
 
@@ -243,7 +286,7 @@ def user_details(request, index):
 @allowed_users(allowed_roles=['admin'])
 def user_edit(request, index):
 
-    context = []
+
     if request.method == 'GET':
         user = get_user_model()
         selected_user = user.objects.filter(id=index)
@@ -269,8 +312,9 @@ def user_edit(request, index):
             admin_group = Group.objects.get(name='admin')
             admin_group.user_set.remove(index)
             employee_group.user_set.add(index)
-        update_user = user.objects.filter(id=index).update(first_name=first_name, last_name=last_name,
-                                                           username=username, email=email)
+
+        update_user = user.objects.filter(id=index).update(first_name=first_name, last_name=last_name, username=username, email=email)
+
         return redirect('users_list')
 
     return render(request, 'schedule/user_edit.html', context)
@@ -287,8 +331,7 @@ def delete_user(request, index):
     except:
         return redirect('users_list')
 
-    #return render(request, 'schedule/users_list.html')
-
+    return render(request, 'schedule/users_list.html')
 
 @allowed_users(allowed_roles=['admin', 'employee'])
 def event_edit(request, index):
@@ -369,15 +412,25 @@ def event_edit(request, index):
 
                     if poll:
                         poll_exist = True
+                        # w trakcie
                         poll_status = ''
                         if poll.since_active <= date.today() < poll.till_active:
                             poll_status = 'in_progress'
+                            # poll_in_progress = True
+                        # else:
+                        #     poll_in_progress = False
+                        # zakonczona
                         elif poll.till_active < date.today():
+                            # poll_ended = True
                             poll_status = 'ended'
+                        # nierozpoczeta
                         elif poll.since_active > date.today():
+                            # poll_not_started = True
                             poll_status = 'not_started'
                         dates = Dates.objects.filter(poll=poll).order_by('date')
                         total_votes = 0
+                        if_voted = False
+                        # sprawdzam czy user juz zaglosowal na ktorykolwiek z terminow
                         for el in dates:
                             if el.users.filter(id=request.user.id).exists():
                                 if_voted = True
@@ -390,6 +443,8 @@ def event_edit(request, index):
                                'poll_in_progress': poll_in_progress, 'poll_exist': poll_exist,
                                'poll_status': poll_status, 'total_votes': total_votes}
                     return render(request, 'schedule/event_edit.html', context)
+                    # context = {'event': event, 'past': past}
+                    # return render(request, 'schedule/event_edit.html', context)
 
                 if request.method == 'POST':
 
@@ -446,6 +501,8 @@ def my_profile(request):
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
 
+        update_user = user.objects.filter(id=request.user.id).update(first_name=first_name, last_name=last_name, email=email)
+
         return redirect('my_profile')
 
     elif request.method == 'POST':
@@ -466,6 +523,7 @@ def my_profile(request):
     return render(request, 'schedule/my_profile.html', context)
 
 
+#@allowed_users(allowed_roles=['admin', 'employee'])
 def event_details(request, index):
 
     if request.method == 'GET':
@@ -482,18 +540,22 @@ def event_details(request, index):
 
         if poll:
             poll_exist = True
+            # w trakcie
             poll_status = ''
             if poll.since_active is None or poll.till_active is None:
                 poll_status = 'not_set'
             elif poll.since_active <= date.today() <= poll.till_active:
                 poll_status = 'in_progress'
+            # zakonczona
             elif poll.till_active < date.today():
                 poll_status = 'ended'
+            # nierozpoczeta
             elif poll.since_active > date.today():
                 poll_status = 'not_started'
             dates = Dates.objects.filter(poll=poll).order_by('date')
             total_votes = 0
             if_voted = False
+            # sprawdzam czy user juz zaglosowal na ktorykolwiek z terminow
             for el in dates:
                 if el.users.filter(id=request.user.id).exists():
                     if_voted = True
@@ -515,6 +577,7 @@ def event_details(request, index):
         comment_id = request.POST.get('comment_id')
         new_content = request.POST.get('new_content')
         form = AddComment()
+        update_comment = Comment.objects.filter(id=comment_id).update(content=new_content, if_edited=True)
         selected_event = Event.objects.filter(id=index)
         comments = Comment.objects.filter(event=index)
         comments_cnt = comments.count()
@@ -527,6 +590,8 @@ def event_details(request, index):
     if request.method == 'POST' and request.POST.get('delete'):
         comment_id = request.POST.get('comment_id')
 
+        delete_comment = Comment.objects.filter(id=comment_id).update(if_deleted=True)
+
         form = AddComment()
         selected_event = Event.objects.filter(id=index)
         comments = Comment.objects.filter(event=index)
@@ -536,6 +601,7 @@ def event_details(request, index):
                    'comments_cnt': comments_cnt}
 
         return render(request, 'schedule/event_details.html', context)
+
 
     if request.method == 'POST' and not request.POST.get('new_content') and request.POST.get('delete') != True:
 
@@ -625,4 +691,6 @@ def handler_400(request, exception):
 
 def handler_500(request):
     return render(request, 'schedule/500.html')
+
+
 

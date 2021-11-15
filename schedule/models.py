@@ -1,7 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.utils.text import slugify
+
+import random
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.dispatch import receiver
+from django.db.models.signals import post_migrate
+from django.contrib.auth import get_user_model
+
 
 class Event(models.Model):
     STATUS_CHOICES = (
@@ -48,3 +57,24 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-created',)
+
+# Needed for 2FA
+#lass CustomUser(User):
+    # To na SMS token ale raczej nie zrobimy z SMS
+    #phone_number = models.CharField(max_length=12)
+
+class Code(models.Model):
+    verification_code = models.CharField(max_length=5, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    def __str__(self):
+        return str(self.verification_code)
+
+    def save(self, *args, **kwargs):
+        number_list = [0,1,2,3,4,5,6,7,8,9]
+        code_items = []
+        for i in range(5):
+            num = random.choice(number_list)
+            code_items.append(num)
+        code_string = "".join(str(item) for item in code_items)
+        self.verification_code =  code_string
+        super().save(*args, **kwargs)
