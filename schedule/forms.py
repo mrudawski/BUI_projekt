@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.db import models
-from .models import Event, Comment
+from .models import Event, Comment, Code
 import datetime
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from .decorators import unauthenticated_user, allowed_users
@@ -54,3 +54,10 @@ class AddComment(ModelForm):
     class Meta:
         model = Comment
         fields = ('author', 'event', 'content', 'if_edited', 'if_deleted')
+
+# 2FA
+class CodeForm(forms.ModelForm):
+    verification_code = forms.CharField(label='Code', help_text='Please enter verification code.')
+    class Meta:
+        model = Code
+        fields = ('verification_code',)
