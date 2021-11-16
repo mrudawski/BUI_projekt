@@ -27,7 +27,8 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
-        super(Event, self).save(*args, **kwargs)
+        # super(Event, self).save(self, *args, **kwargs)
+        super(Event, self).save(self, *args, **kwargs)
 
     # topics
 
@@ -35,6 +36,7 @@ class Event(models.Model):
         ordering = ('planning_date',)
 
     def __str__ (self):
+        """String"""
         return self.title
 
 

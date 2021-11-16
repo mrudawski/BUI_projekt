@@ -181,8 +181,8 @@ def create_event(request):
         if form.is_valid():
             organizer = form.cleaned_data.get('organizer')
             event_form = form.save()
-            event_pk = event_form.pk
-            organizer_pk = get_object_or_404(User, username=organizer).pk
+            # event_pk = event_form.pk
+            # organizer_pk = get_object_or_404(User, username=organizer).pk
             request.session['ref_times'] = 0
             request.session['event_success'] = True
             return redirect('events_list')
