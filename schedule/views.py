@@ -29,6 +29,8 @@ from .utils import token_generator
 import os
 import string
 import smtplib
+import urllib
+import json
 
 
 def home_page(request):
@@ -114,6 +116,24 @@ def register_page(request):
         number_set = bool(set(numbers_pass) & set(password1))
         if number_set is False:
             messages.success(request, 'Hasło powinno zawierać przynajmniej jedną cyfrę')
+            return redirect('register')
+
+        #captcha
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        url = 'https://www.google.com/recaptcha/api/siteverify'
+        values = {
+            'secret': os.environ.get('GOOGLE_RECAPTCHA_SECRET_KEY'),
+            'response': recaptcha_response
+        }
+        data = urllib.parse.urlencode(values).encode()
+        req = urllib.request.Request(url, data=data)
+        response = urllib.request.urlopen(req)
+        result = json.loads(response.read().decode())
+
+        if result['success']:
+            pass
+        else:
+            messages.success(request, 'Nieprawidłowa reCAPTCHA. Spróbuj ponownie.')
             return redirect('register')
 
         user_obj = User.objects.create_user(username=username, email=email, password=password1, first_name=first_name, last_name=last_name)
