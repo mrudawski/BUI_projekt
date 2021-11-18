@@ -16,11 +16,18 @@ from django.core.paginator import Paginator, EmptyPage
 from django.template.loader import render_to_string
 from .forms import ChangePassword
 from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import force_text, force_bytes, DjangoUnicodeDecodeError
+from .utils import token_generator
+import os
+import string
 
 
 def home_page(request):
@@ -44,17 +51,21 @@ def login_page(request):
         if not remember_me:
             request.session.set_expiry(0)
 
-        user = authenticate(request, username=username, password=password)
+        if User.objects.filter(username=username).exists():
+            user = User.objects.filter(username=username).first()
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                if not user.is_active:
+                    messages.success(request, 'Konto nieaktywne')
+                    return redirect('login')
+                if 'next' in request.POST:
+                    if not remember_me:
+                        request.session.set_expiry(0)
 
-        if user is not None:
-            login(request, user)
-            if 'next' in request.POST:
-                if not remember_me:
-                    request.session.set_expiry(0)
-
-                return redirect(request.POST.get('next'))
-            else:
-                return redirect('home')
+                    return redirect(request.POST.get('next'))
+                else:
+                    return redirect('home')
         else:
             messages.info(request, 'Nazwa użytkownika lub hasło są nieprawidłowe')
 
@@ -65,22 +76,98 @@ def login_page(request):
 @unauthenticated_user
 def register_page(request):
     if request.method == 'POST':
-        form = CreateUserForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            group = Group.objects.get(name='employee')
-            user.groups.add(group)
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('home')
 
-    else:
-        form = CreateUserForm()
+        username = request.POST.get('username').strip()
+        first_name = request.POST.get('first_name').strip()
+        last_name = request.POST.get('last_name').strip()
+        email = request.POST.get('email').strip()
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
 
-    context = {'form': form}
-    return render(request, 'schedule/register.html', context)
+        if User.objects.filter(username=username).exists():
+            messages.success(request, 'Nazwa użytkownika zajęta')
+            return redirect('register')
+        if User.objects.filter(email=email).exists():
+            messages.success(request, 'Adres email zajęty')
+            return redirect('register')
+
+        if password1 != password2:
+            messages.success(request, 'Hasła nie są takie same')
+            return redirect('register')
+
+        special_characters = ["'", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "{", "}", "[",
+                              "]", "|", ":", '"', ";", "<", ">", "?", ",", ".", "\\", "/"]
+
+        special_set = bool(set(special_characters) & set(password1))
+        if special_set is False:
+            messages.success(request, 'Hasło powinno zawierać znaki specjalne')
+            return redirect('register')
+
+        alphabet_upper = string.ascii_uppercase
+        alpha_set = bool(set(alphabet_upper) & set(password1))
+        if alpha_set is False:
+            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną wielką literę')
+            return redirect('register')
+
+        numbers_pass = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+        number_set = bool(set(numbers_pass) & set(password1))
+        if number_set is False:
+            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną cyfrę')
+            return redirect('register')
+
+        user_obj = User.objects.create_user(username=username, email=email, password=password1, first_name=first_name, last_name=last_name)
+        user_obj.set_password(password1)
+        user_obj.is_active = False
+        group = Group.objects.get(name='employee')
+        user_obj.groups.add(group)
+        user_obj.save()
+        current_site = get_current_site(request)
+
+        email_subject = 'Aktywacja konta'
+        email_body = {
+            'user': user_obj,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(user_obj.pk)),
+            'token': token_generator.make_token(user_obj),
+        }
+
+        link = reverse('activate', kwargs={
+            'uidb64': email_body['uid'], 'token': email_body['token']})
+        activate_url = 'http://' + current_site.domain + link
+        email_s = EmailMessage(
+                email_subject,
+                'Cześć '+user_obj.username + ', kliknij w link aby aktywować swoje konto \n'+activate_url,
+                'noreply@buibuibui.com',
+                [email],
+                )
+        email_s.send()
+        messages.success(request, 'Konto utworzone')
+
+    return render(request, 'schedule/register.html')
+
+
+def verification(request, uidb64, token):
+
+    try:
+        ida = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=ida)
+        if not token_generator.check_token(user, token):
+            messages.success(request, 'Konto już aktywowany')
+            return redirect('login')
+
+        if user.is_active:
+            return redirect('login')
+
+        user.is_active = True
+        user.save()
+
+        messages.success(request, 'Konto aktywowane')
+        return redirect('login')
+
+    except Exception as ex:
+        pass
+
+    return redirect('login')
 
 
 def events_list(request):

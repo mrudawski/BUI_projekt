@@ -47,22 +47,23 @@
     <a href="{% url 'home' %}"><img class="mb-4" style="max-height: 80px" src="{% static 'images/logo-light2.png' %}" href="{% url 'home' %}" alt=""></a>
     <h2>Zarejestruj się</h2>
     <br>
+    {% for message in messages %}
+        <errormsg>{{ message }}</errormsg>
+      {% endfor %}
+    <br>
     <div class="form-floating">
       <input type="text" class="form-control" id="username" name="username" placeholder="Login" required>
       <label for="username">Login</label>
-        <errormsg>{{ form.username.errors }}</errormsg>
     </div>
       <br>
           <div class="form-floating">
       <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Imię" required>
       <label for="username">Imię</label>
-        <errormsg>{{ form.first_name.errors }}</errormsg>
     </div>
       <br>
           <div class="form-floating">
       <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Nazwisko" required>
       <label for="username">Nazwisko</label>
-        <errormsg>{{ form.last_name.errors }}</errormsg>
     </div>
       <br>
     <div class="form-floating">
@@ -73,7 +74,6 @@
     <div class="form-floating">
       <input type="password" class="form-control" id="password1" name="password1" placeholder="Hasło" required minlength="8">
       <label for="password1">Hasło</label>
-        <errormsg>{{ form.password1.errors }}</errormsg>
     </div>
       <br>
     <div class="form-floating">
@@ -82,11 +82,9 @@
       <div id="validationServer04Feedback" class="invalid-feedback">
       Wprowadzone hasła nie są takie same
     </div>
-        <errormsg>{{ form.password2.errors }}</errormsg>
     </div>
     <br>
     <button class="w-100 btn btn-lg btn-primary" style="font-family: 'Oswald', sans-serif;" type="submit" id="submitButton">Zarejestruj</button>
-
     <p class="mt-5 mb-3 text-muted">&copy; BuiBui App 2021</p>
   </form>
 </main>

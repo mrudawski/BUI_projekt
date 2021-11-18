@@ -6,6 +6,7 @@ from .models import Event, Comment
 import datetime
 from django.contrib.auth.forms import PasswordChangeForm
 
+
 class UserFullnameChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         fullname = obj.get_full_name()

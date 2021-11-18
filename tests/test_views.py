@@ -81,6 +81,11 @@ class TestViews(TestCase):
         response = self.client.post(self.register_page_url, {
             'username': self.user1.username,
             'password': self.user1.password,
+            'first_name': 'sample',
+            'last_name': 'sample',
+            'email': 'sample',
+            'password1': 'sample',
+            'password2': 'sample',
         })
         CreateUserForm(data={
             'username': 'sample',
@@ -92,7 +97,7 @@ class TestViews(TestCase):
         })
 
         # self.assertTrue(form.is_valid())
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
 
     def test_events_list_GET (self):
         response = self.client.get(self.events_list_url)
