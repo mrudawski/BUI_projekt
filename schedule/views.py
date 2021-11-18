@@ -28,6 +28,7 @@ from django.utils.encoding import force_text, force_bytes, DjangoUnicodeDecodeEr
 from .utils import token_generator
 import os
 import string
+import smtplib
 
 
 def home_page(request):
@@ -134,13 +135,20 @@ def register_page(request):
         link = reverse('activate', kwargs={
             'uidb64': email_body['uid'], 'token': email_body['token']})
         activate_url = 'http://' + current_site.domain + link
-        email_s = EmailMessage(
-                email_subject,
-                'Cześć '+user_obj.username + ', kliknij w link aby aktywować swoje konto \n'+activate_url,
-                'noreply@buibuibui.com',
-                [email],
-                )
-        email_s.send()
+        # email_s = EmailMessage(
+        #         email_subject,
+        #         'Cześć '+user_obj.username + ', kliknij w link aby aktywować swoje konto \n'+activate_url,
+        #         'noreply@buibuibui.com',
+        #         [email],
+        #         )
+        # email_s.send()
+
+        msg = f"From: noreply@buibuibui.com\r\nTo: {email}\r\nSubject: Rejestracja\n\n Czesc {user_obj.username} kliknij w link aby aktywowac swoje konto {activate_url}"
+        with smtplib.SMTP(host=os.environ.get('EMAIL_HOST'), port=os.environ.get('EMAIL_PORT')) as server:
+            server.starttls()
+            server.login(os.environ.get('EMAIL_HOST_USER'), os.environ.get('EMAIL_HOST_PASSWORD'))
+            server.sendmail('noreply@buibuibui.com', email, msg)
+
         messages.success(request, 'Konto utworzone')
 
     return render(request, 'schedule/register.html')
