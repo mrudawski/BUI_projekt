@@ -134,7 +134,7 @@ def register_page(request):
 
         link = reverse('activate', kwargs={
             'uidb64': email_body['uid'], 'token': email_body['token']})
-        activate_url = 'http://' + current_site.domain + link
+        activate_url = 'https://' + current_site.domain + link
         # email_s = EmailMessage(
         #         email_subject,
         #         'Cześć '+user_obj.username + ', kliknij w link aby aktywować swoje konto \n'+activate_url,
