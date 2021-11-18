@@ -33,6 +33,21 @@ import urllib
 import json
 
 
+def captcha (request):
+    recaptcha_response = request.POST.get('g-recaptcha-response')
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    values = {
+        'secret': os.environ.get('GOOGLE_RECAPTCHA_SECRET_KEY'),
+        'response': recaptcha_response
+    }
+    data = urllib.parse.urlencode(values).encode()
+    req = urllib.request.Request(url, data=data)
+    response = urllib.request.urlopen(req)
+    result = json.loads(response.read().decode())
+
+    return result
+
+
 def home_page(request):
     now = timezone.now()
     upcoming_events_list = Event.objects.filter(planning_date__gte=now)
@@ -50,6 +65,14 @@ def login_page(request):
         username = request.POST.get('username')  # html name="username"
         password = request.POST.get('password')
         remember_me = request.POST.get('remember_me')
+
+        # captcha
+        result = captcha(request)
+        if result['success']:
+            pass
+        else:
+            messages.success(request, 'Nieprawidłowa reCAPTCHA. Spróbuj ponownie.')
+            return redirect('register')
 
         if not remember_me:
             request.session.set_expiry(0)
@@ -119,17 +142,7 @@ def register_page(request):
             return redirect('register')
 
         #captcha
-        recaptcha_response = request.POST.get('g-recaptcha-response')
-        url = 'https://www.google.com/recaptcha/api/siteverify'
-        values = {
-            'secret': os.environ.get('GOOGLE_RECAPTCHA_SECRET_KEY'),
-            'response': recaptcha_response
-        }
-        data = urllib.parse.urlencode(values).encode()
-        req = urllib.request.Request(url, data=data)
-        response = urllib.request.urlopen(req)
-        result = json.loads(response.read().decode())
-
+        result = captcha(request)
         if result['success']:
             pass
         else:
