@@ -81,6 +81,11 @@ class TestViews(TestCase):
         response = self.client.post(self.register_page_url, {
             'username': self.user1.username,
             'password': self.user1.password,
+            'first_name': 'sample',
+            'last_name': 'sample',
+            'email': 'sample',
+            'password1': 'sample',
+            'password2': 'sample',
         })
         CreateUserForm(data={
             'username': 'sample',
