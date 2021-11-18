@@ -97,7 +97,7 @@ class TestViews(TestCase):
         })
 
         # self.assertTrue(form.is_valid())
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
 
     def test_events_list_GET (self):
         response = self.client.get(self.events_list_url)
