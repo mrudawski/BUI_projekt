@@ -88,14 +88,14 @@ def register_page(request):
         password2 = request.POST.get('password2')
 
         if User.objects.filter(username=username).exists():
-            messages.success(request, 'Nazwa użytkownika zajęta')
+            messages.success(request, 'Nazwa użytkownika zajęta.')
             return redirect('register')
         if User.objects.filter(email=email).exists():
-            messages.success(request, 'Adres email zajęty')
+            messages.success(request, 'Adres email zajęty.')
             return redirect('register')
 
         if password1 != password2:
-            messages.success(request, 'Hasła nie są takie same')
+            messages.success(request, 'Hasła nie są takie same.')
             return redirect('register')
 
         special_characters = ["'", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "{", "}", "[",
@@ -103,19 +103,19 @@ def register_page(request):
 
         special_set = bool(set(special_characters) & set(password1))
         if special_set is False:
-            messages.success(request, 'Hasło powinno zawierać znaki specjalne')
+            messages.success(request, 'Hasło powinno zawierać znaki specjalne.')
             return redirect('register')
 
         alphabet_upper = string.ascii_uppercase
         alpha_set = bool(set(alphabet_upper) & set(password1))
         if alpha_set is False:
-            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną wielką literę')
+            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną wielką literę.')
             return redirect('register')
 
         numbers_pass = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
         number_set = bool(set(numbers_pass) & set(password1))
         if number_set is False:
-            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną cyfrę')
+            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną cyfrę.')
             return redirect('register')
 
         #captcha
@@ -155,13 +155,13 @@ def register_page(request):
             'uidb64': email_body['uid'], 'token': email_body['token']})
         activate_url = 'https://' + current_site.domain + link
 
-        msg = f"From: noreply@buibuibui.com\r\nTo: {email}\r\nSubject: Aktywacja konta\n\n Czesc, {user_obj.username} kliknij w link aby aktywowac swoje konto {activate_url}"
+        msg = f"From: noreply@buibuibui.com\r\nTo: {email}\r\nSubject: Aktywacja konta\n\n Czesc {user_obj.username}, kliknij w link aby aktywowac swoje konto {activate_url}"
         with smtplib.SMTP(host=os.environ.get('EMAIL_HOST'), port=os.environ.get('EMAIL_PORT')) as server:
             server.starttls()
             server.login(os.environ.get('EMAIL_HOST_USER'), os.environ.get('EMAIL_HOST_PASSWORD'))
             server.sendmail('noreply@buibuibui.com', email, msg)
 
-        messages.success(request, 'Konto utworzone')
+        messages.success(request, 'Konto utworzone. Link aktywacyjny wysłany.')
 
     return render(request, 'schedule/register.html')
 
@@ -172,7 +172,7 @@ def verification(request, uidb64, token):
         ida = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=ida)
         if not token_generator.check_token(user, token):
-            messages.success(request, 'Konto już aktywowany')
+            messages.success(request, 'Konto już aktywowane.')
             return redirect('login')
 
         if user.is_active:
@@ -181,7 +181,7 @@ def verification(request, uidb64, token):
         user.is_active = True
         user.save()
 
-        messages.success(request, 'Konto aktywowane')
+        messages.success(request, 'Konto aktywowane.')
         return redirect('login')
 
     except Exception as ex:
