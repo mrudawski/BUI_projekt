@@ -27,6 +27,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_text, force_bytes, DjangoUnicodeDecodeError
 from .utils import token_generator
 import os
+import string
 
 
 def home_page(request):
@@ -52,19 +53,13 @@ def login_page(request):
 
         if User.objects.filter(username=username).exists():
             user = User.objects.filter(username=username).first()
-            #user = authenticate(request, username=username, password=password)
-            print('54-------------')
-            print(user)
             if user is not None:
-                print('59')
                 if user.is_active:
-                    print('61')
                     login(request, user)
                 if not user.is_active:
-                    print('64')
                     messages.success(request, 'Konto nieaktywne')
+                    return redirect('login')
                 if 'next' in request.POST:
-                    print('67')
                     if not remember_me:
                         request.session.set_expiry(0)
 
@@ -82,18 +77,42 @@ def login_page(request):
 def register_page(request):
     if request.method == 'POST':
 
-        username = request.POST.get('username')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
+        username = request.POST.get('username').strip()
+        first_name = request.POST.get('first_name').strip()
+        last_name = request.POST.get('last_name').strip()
+        email = request.POST.get('email').strip()
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
 
         if User.objects.filter(username=username).exists():
-            messages.success(request, 'Nazwa użytkownika zajęta.')
+            messages.success(request, 'Nazwa użytkownika zajęta')
             return redirect('register')
         if User.objects.filter(email=email).exists():
-            messages.success(request, 'Adres email zajęty.')
+            messages.success(request, 'Adres email zajęty')
+            return redirect('register')
+
+        if password1 != password2:
+            messages.success(request, 'Hasła nie są takie same')
+            return redirect('register')
+
+        special_characters = ["'", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "{", "}", "[",
+                              "]", "|", ":", '"', ";", "<", ">", "?", ",", ".", "\\", "/"]
+
+        special_set = bool(set(special_characters) & set(password1))
+        if special_set is False:
+            messages.success(request, 'Hasło powinno zawierać znaki specjalne')
+            return redirect('register')
+
+        alphabet_upper = string.ascii_uppercase
+        alpha_set = bool(set(alphabet_upper) & set(password1))
+        if alpha_set is False:
+            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną wielką literę')
+            return redirect('register')
+
+        numbers_pass = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+        number_set = bool(set(numbers_pass) & set(password1))
+        if number_set is False:
+            messages.success(request, 'Hasło powinno zawierać przynajmniej jedną cyfrę')
             return redirect('register')
 
         user_obj = User.objects.create_user(username=username, email=email, password=password1, first_name=first_name, last_name=last_name)
@@ -103,9 +122,8 @@ def register_page(request):
         user_obj.groups.add(group)
         user_obj.save()
         current_site = get_current_site(request)
-        #uidb64 = urlsafe_base64_encode(force_bytes(user_obj.pk))
-        #domain = get_current_site(request).domain
-        email_subject = 'Activate account'
+
+        email_subject = 'Aktywacja konta'
         email_body = {
             'user': user_obj,
             'domain': current_site.domain,
@@ -118,26 +136,13 @@ def register_page(request):
         activate_url = 'http://' + current_site.domain + link
         email_s = EmailMessage(
                 email_subject,
-                'Hi '+user_obj.username + ', Please the link below to activate your account \n'+activate_url,
-                'noreply@semycolon.com',
+                'Cześć '+user_obj.username + ', kliknij w link aby aktywować swoje konto \n'+activate_url,
+                'noreply@buibuibui.com',
                 [email],
                 )
         email_s.send()
         messages.success(request, 'Konto utworzone')
-        # if form.is_valid():
-        #     user = form.save()
-        #     username = form.cleaned_data.get('username')
-        #     raw_password = form.cleaned_data.get('password1')
-        #     group = Group.objects.get(name='employee')
-        #     user.groups.add(group)
-        #     user = authenticate(username=username, password=raw_password)
-        #     login(request, user)
-        #     return redirect('home')
 
-    # else:
-    #     form = CreateUserForm()
-
-    #context = {'form': form}
     return render(request, 'schedule/register.html')
 
 
@@ -146,9 +151,9 @@ def verification(request, uidb64, token):
     try:
         ida = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=ida)
-        print(user)
         if not token_generator.check_token(user, token):
-            return redirect('login' + '?message=' + 'User already activated')
+            messages.success(request, 'Konto już aktywowany')
+            return redirect('login')
 
         if user.is_active:
             return redirect('login')
