@@ -4,7 +4,7 @@ from .models import Event
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 from .models import User
-from .models import Code
+# from .models import Code
 
 @receiver(post_migrate)
 def populate_models(sender, **kwargs):

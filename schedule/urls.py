@@ -1,6 +1,6 @@
 import django.contrib.auth.views
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.views.static import serve
 from django.conf.urls.static import static
@@ -8,14 +8,26 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
+from two_factor.views import (
+    BackupTokensView, DisableView, LoginView, PhoneDeleteView, PhoneSetupView,
+    ProfileView, QRGeneratorView, SetupCompleteView, SetupView,
+)
+from two_factor.urls import urlpatterns as tf_urls
 
 urlpatterns = [
+    path('', include(tf_urls)), #2FA
+    path('account/login/',LoginView.as_view(),name='login2'),
+    path(
+        'account/two_factor/',
+        ProfileView.as_view(),
+        name='2f_setup',
+    ),
     path('admin/', admin.site.urls),
-    path('', views.home_page, name='home'),  # HERE 2 FA
+    path('accounts/profile/',views.home_page, name='home'),
+    path('', views.home_page, name='home'),
     path('events_list/', views.events_list, name='events_list'),
     path('register/', views.register_page, name='register'),
-    path('verify/', views.verify_page, name='verify'),  # HERE 2 FA
-    path('login/', views.login_page, name='login'), # HERE 2 FA
+    path('login/', views.login_page, name='login'),
     path('logout/', views.logout_user, name='logout'),
     path('create_event/', views.create_event, name='create_event'),
     path('about/', views.about, name='about'),
@@ -37,6 +49,7 @@ urlpatterns = [
     path('event_details/<int:index>', views.event_details, name='event_details'),
     path('403/', views.handler_403, name='403'),
     url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
-    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT})
+    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+
 
 ]

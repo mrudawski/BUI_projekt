@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Event, Comment, User
 
 # 2FA
-from .models import Code
+# from .models import Code
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -19,6 +19,5 @@ class EventAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     pass
 
-# 2FA ??
-# @admin.site.register(Code,CustomUser)
+
 

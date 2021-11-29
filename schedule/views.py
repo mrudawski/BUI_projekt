@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from .models import Event, User, Comment, User
+from .models import Event, User, Comment
 from django.core.mail import send_mail, get_connection, send_mass_mail
 from django.core.mail import EmailMessage
 from django.utils import timezone
@@ -24,7 +24,7 @@ import os
 from .forms import ChangePassword
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.contrib.auth.forms import PasswordResetForm, AuthenticationForm
+from django.contrib.auth.forms import PasswordResetForm
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
@@ -34,73 +34,49 @@ from django.db.models import Q
 from django.core.mail import BadHeaderError, send_mail
 from django.template import loader
 from collections import Counter
-#from Crypto.Cipher import DES
+# from Crypto.Cipher import DES
 from django.contrib.messages import get_messages
-from .forms import CodeForm
 
-@login_required()
+
 def home_page(request):
     now = timezone.now()
     upcoming_events_list = Event.objects.filter(planning_date__gte=now)
+
     context = {'upcoming_events_list': upcoming_events_list}
+
     return render(request, 'schedule/home.html', context)
 
 
-# 2FA Verify view - weryfikacja tokenu
-def verify_page(request):
-    print("VERIFY PAGE")
-    form = CodeForm(request.POST or None)
-    #remember_me = request.POST.get('remember_me')
-
-    pk = request.session.get('pk')  # Primary Key
-    print(pk)
-    user = User.objects.get(pk=pk)
-    code = user.code
-    code_user = f'{user.username}: {user.code}'
-
-    print(code_user)
-    if  not request.POST:
-        pass
-        #print(code_user)
-        #print(user.code)
-            # pass
-            # sending to the user via email/SMS
-    if form.is_valid():
-        num = form.cleaned_data.get('verification_code')
-        #if str(code) == num: # Jeśli Token poprawny
-            #code.save()
-            #return redirect('home')
-        #else:
-            #messages.info(request, 'Nazwa użytkownika, hasło, lub token są nieprawidłowe')
-    context = {}
-    return render(request, 'schedule/login.html', context)
-
 def login_page(request):
-    # For 2FA
-    print("LOGIN PAGEEEE")
-    form = CodeForm(request.POST or None)
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == 'POST':
+
         username = request.POST.get('username')  # html name="username"
         password = request.POST.get('password')
         remember_me = request.POST.get('remember_me')
+
         if not remember_me:
             request.session.set_expiry(0)
 
         user = authenticate(request, username=username, password=password)
-        # 2FA
+
+        # Sprawdzanie parametru next, by móc przekierować niezalogowanego użytkownika
+        # w miejsce do którego chciał się dostać po poprawnym logowaniu
         if user is not None:
-            request.session['pk'] = user.pk
-            print("LOGIN PAGE: Idziesz do VERIFY!")
-            return redirect('verify')
-            #return render(request, 'schedule/verify.html', {'form': form})
-        return render(request, 'schedule/login.html')
-    else:
-        messages.info(request, 'Nazwa użytkownika lub hasło są nieprawidłowe')
+            login(request, user)
+            if 'next' in request.POST:
+                if not remember_me:
+                    request.session.set_expiry(0)
+
+                return redirect(request.POST.get('next'))
+            else:
+                return redirect('home')
+        else:
+            messages.info(request, 'Nazwa użytkownika lub hasło są nieprawidłowe')
+
     context = {}
     return render(request, 'schedule/login.html', context)
-
 
 
 @unauthenticated_user
@@ -182,6 +158,11 @@ def events_list(request):
         all_events_list = all_events_list.all()
 
     # FILTROWANIE
+
+
+
+
+
 
 
     pa = Paginator(all_events_list, 12)
@@ -691,6 +672,4 @@ def handler_400(request, exception):
 
 def handler_500(request):
     return render(request, 'schedule/500.html')
-
-
 

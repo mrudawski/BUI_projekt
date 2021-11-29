@@ -59,22 +59,18 @@ class Comment(models.Model):
         ordering = ('-created',)
 
 # Needed for 2FA
-#lass CustomUser(User):
-    # To na SMS token ale raczej nie zrobimy z SMS
-    #phone_number = models.CharField(max_length=12)
-
-class Code(models.Model):
-    verification_code = models.CharField(max_length=5, blank=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    def __str__(self):
-        return str(self.verification_code)
-
-    def save(self, *args, **kwargs):
-        number_list = [0,1,2,3,4,5,6,7,8,9]
-        code_items = []
-        for i in range(5):
-            num = random.choice(number_list)
-            code_items.append(num)
-        code_string = "".join(str(item) for item in code_items)
-        self.verification_code =  code_string
-        super().save(*args, **kwargs)
+# class Code(models.Model):
+#     verification_code = models.CharField(max_length=5, blank=True)
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     def __str__(self):
+#         return str(self.verification_code)
+#
+#     def save(self, *args, **kwargs):
+#         number_list = [0,1,2,3,4,5,6,7,8,9]
+#         code_items = []
+#         for i in range(5):
+#             num = random.choice(number_list)
+#             code_items.append(num)
+#         code_string = "".join(str(item) for item in code_items)
+#         self.verification_code =  code_string
+#         super().save(*args, **kwargs)

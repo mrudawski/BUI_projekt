@@ -51,10 +51,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'schedule',
- #  'models',
     'crispy_forms',
-
-
+     # 2FA
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
 ]
 
 MIDDLEWARE = [
@@ -65,12 +67,21 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 2FA
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
+
 ]
+
+
+
 
 MIDDLEWARE_CLASSES = (
     # Simplified static file serving.
     # https://warehouse.python.org/project/whitenoise/
-    'whitenoise.middleware.WhiteNoiseMiddleware',)
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    )
 
 
 ROOT_URLCONF = 'scheduler_project.urls'
@@ -165,8 +176,5 @@ USE_L10N = True
 
 USE_TZ = False
 
-
-# 2FA
-#CRISPY_TEMPLATE_PACK = 'bootstrap4'
-LOGIN_URL = '/login/'
-#AUTH_USER_MODEL = 'CustomUser'
+# LOGIN_URL = '/login/'
+LOGIN_URL = 'two_factor:login'

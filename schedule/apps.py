@@ -4,5 +4,5 @@ class ScheduleConfig(AppConfig):
     name = 'schedule'
     verbose_name = 'schedule'
 
-    def ready(self):
-        from . import signals
+    # def ready(self):
+        # from . import signals
