@@ -122,7 +122,11 @@ def mfa_login(request):
             code_obj, created = MFAUser.objects.update_or_create(
                 user=user, defaults={"code": randint(100000, 999999)})
 
-            send_mail("2FA Code", str(code_obj.code), os.environ.get('EMAIL_HOST_USER'), [(user.email)])
+            msg = f"From: noreply@buibuibui.com\r\nTo: {user.email}\r\nSubject: Kod MFA\n\n Czesc {user.username}, oto Twój kod do uwierzytelnienia {code_obj}"
+            with smtplib.SMTP(host=os.environ.get('EMAIL_HOST'), port=os.environ.get('EMAIL_PORT')) as server:
+                server.starttls()
+                server.login(os.environ.get('EMAIL_HOST_USER'), os.environ.get('EMAIL_HOST_PASSWORD'))
+                server.sendmail('noreply@buibuibui.com', user.email, msg)
 
     else:
         return redirect('home')
