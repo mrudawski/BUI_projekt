@@ -109,26 +109,25 @@ def mfa_login(request):
             if form.is_valid():
                 code_obj = MFAUser.objects.get(user__exact=user)
                 if int(code_obj.code) == int(form.cleaned_data.get("code")):
-                    messages.success(request, 'Zalogowano poprawnie')
                     login(request, user)
                     del request.session['mfa_code']
                     return redirect('home')
                 else:
-                    messages.error(request, "Code invalid.")
+                    messages.error(request, 'Kod niepoprawny.')
             else:
-                messages.error(request, "Code invalid.")
+                messages.error(request, 'Kod niepoprawny.')
         else:
             form = MFA_Form()
 
             code_obj, created = MFAUser.objects.update_or_create(
                 user=user, defaults={"code": randint(100000, 999999)})
 
-            send_mail("2FA Code", str(code_obj.code), os.environ.get('EMAIL_HOST_USER'), (user.username,))
+            send_mail("2FA Code", str(code_obj.code), os.environ.get('EMAIL_HOST_USER'), [(user.email)])
 
     else:
         return redirect('home')
 
-    return render(request, "mfa.html", {"form": form})
+    return render(request, 'schedule/mfa.html', {"form": form})
 
 
 @unauthenticated_user
@@ -198,7 +197,7 @@ def register_page(request):
 
         link = reverse('activate', kwargs={
             'uidb64': email_body['uid'], 'token': email_body['token']})
-        activate_url = 'https://' + current_site.domain + link
+        activate_url = 'https://' + '34.116.192.24' + link
 
         msg = f"From: noreply@buibuibui.com\r\nTo: {email}\r\nSubject: Aktywacja konta\n\n Czesc {user_obj.username}, kliknij w link aby aktywowac swoje konto {activate_url}"
         with smtplib.SMTP(host=os.environ.get('EMAIL_HOST'), port=os.environ.get('EMAIL_PORT')) as server:
