@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import CreateUserForm
+from random import randint
 from .forms import CreateEvent
 from .forms import AddComment
 from django.contrib import messages
@@ -8,7 +8,7 @@ from datetime import datetime, date
 from django.contrib.auth.models import Group
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
-from .models import Event, User, Comment
+from .models import Event, User, Comment, MFAUser
 from django.core.mail import get_connection
 from django.core.mail import EmailMessage
 from django.utils import timezone
@@ -17,20 +17,19 @@ from django.template.loader import render_to_string
 from .forms import ChangePassword
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.shortcuts import get_object_or_404
-from django.utils.encoding import force_text, force_bytes, DjangoUnicodeDecodeError
+from django.utils.encoding import force_text, force_bytes
 from .utils import token_generator
 import os
 import string
 import smtplib
 import urllib
 import json
+from django.core.mail import send_mail
+from .forms import MFA_Form
 
 
 def captcha (request):
@@ -49,6 +48,7 @@ def captcha (request):
 
 
 def home_page(request):
+    request.session['12'] = 'asdasd'
     now = timezone.now()
     upcoming_events_list = Event.objects.filter(planning_date__gte=now)
 
@@ -81,7 +81,9 @@ def login_page(request):
             user = User.objects.filter(username=username).first()
             if user is not None:
                 if user.is_active:
-                    login(request, user)
+                    #  check 2fa
+                    request.session['mfa_code'] = user.id
+                    return redirect('mfa')
                 if not user.is_active:
                     messages.success(request, 'Konto nieaktywne')
                     return redirect('login')
@@ -97,6 +99,36 @@ def login_page(request):
 
     context = {}
     return render(request, 'schedule/login.html', context)
+
+
+def mfa_login(request):
+    if user_id := request.session.get('mfa_code'):
+        user = User.objects.get(id__exact=user_id)
+        if request.method == 'POST':
+            form = MFA_Form(data=request.POST)
+            if form.is_valid():
+                code_obj = MFAUser.objects.get(user__exact=user)
+                if int(code_obj.code) == int(form.cleaned_data.get("code")):
+                    messages.success(request, 'Zalogowano poprawnie')
+                    login(request, user)
+                    del request.session['mfa_code']
+                    return redirect('home')
+                else:
+                    messages.error(request, "Code invalid.")
+            else:
+                messages.error(request, "Code invalid.")
+        else:
+            form = MFA_Form()
+
+            code_obj, created = MFAUser.objects.update_or_create(
+                user=user, defaults={"code": randint(100000, 999999)})
+
+            send_mail("2FA Code", str(code_obj.code), os.environ.get('EMAIL_HOST_USER'), (user.username,))
+
+    else:
+        return redirect('home')
+
+    return render(request, "mfa.html", {"form": form})
 
 
 @unauthenticated_user

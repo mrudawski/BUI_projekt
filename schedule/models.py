@@ -46,3 +46,9 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-created',)
+
+
+class MFAUser(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
+    code = models.IntegerField(max_length=6)
+

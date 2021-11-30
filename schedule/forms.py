@@ -52,3 +52,7 @@ class AddComment(ModelForm):
     class Meta:
         model = Comment
         fields = ('author', 'event', 'content', 'if_edited', 'if_deleted')
+
+
+class MFA_Form(forms.Form):
+    code = forms.CharField(label='mfa_code', max_length=6)
