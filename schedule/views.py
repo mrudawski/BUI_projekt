@@ -113,7 +113,7 @@ def mfa_login(request):
                     del request.session['mfa_code']
                     return redirect('home')
                 else:
-                    messages.error(request, 'Kod niepoprawny. Wysłano kod ponownie.')
+                    messages.error(request, 'Kod niepoprawny.')
             else:
                 messages.error(request, 'Kod niepoprawny.')
         else:
